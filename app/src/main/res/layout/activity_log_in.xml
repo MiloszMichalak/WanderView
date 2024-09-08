@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SignUpActivity"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:background="@drawable/background_gradient">
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="260dp"
+        android:background="@drawable/mountaing_bg">
+
+        <TextView
+            android:id="@+id/welcomeText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:gravity="center_horizontal"
+            android:text="@string/welcome_back_text"
+            android:textSize="24sp"
+            android:layout_gravity="center_horizontal"/>
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:showDividers="middle"
+        android:divider="@drawable/empty_divider"
+        android:orientation="vertical"
+        android:layout_marginTop="45dp">
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="@string/email"
+            android:backgroundTint="@color/olive"
+            android:width="240dp"
+            android:minHeight="48dp"
+            android:inputType="textEmailAddress"
+            android:autofillHints="emailAddress"
+            android:labelFor="@id/welcomeText"
+            android:id="@+id/editTextEmail"/>
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/olive"
+            android:inputType="textPassword"
+            android:autofillHints="password"
+            android:labelFor="@id/welcomeText"
+            android:hint="@string/password"
+            android:minHeight="48dp"
+            android:width="240dp"
+            android:id="@+id/editTextPassword"/>
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/round_border"
+        android:text="@string/login"
+        android:layout_marginTop="45dp"
+        android:width="160dp"
+        android:id="@+id/logInButton"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:showDividers="middle"
+        android:divider="@drawable/empty_divider"
+        android:layout_marginTop="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/new_user" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/signika_semibold"
+            android:text="@string/sign_up"
+            android:id="@+id/swapToSignUp"/>
+    </LinearLayout>
+
+</LinearLayout>
