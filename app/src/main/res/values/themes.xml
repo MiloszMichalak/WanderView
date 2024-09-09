@@ -2,13 +2,32 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.WanderView" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/olive</item>
+        <item name="colorSecondary">@color/beige</item>
+        <item name="android:windowBackground">@drawable/light_background_gradient</item>
+        <item name="android:fontFamily">@font/signika</item>
     </style>
 
     <style name="Theme.WanderView" parent="Base.Theme.WanderView">
-        <item name="android:fontFamily">@font/signika</item>
-        <item name="android:textColor">@color/beige</item>
-        <item name="android:textColorHint">@color/beige_light</item>
+        <item name="android:textColor">@color/grey</item>
     </style>
+
+    <style name="FilledBox" parent="Widget.Material3.TextInputLayout.FilledBox">
+        <item name="errorEnabled">true</item>
+        <item name="cursorColor">@color/grey</item>
+        <item name="boxBackgroundColor">@color/beige</item>
+        <item name="android:textColorHint">@color/grey</item>
+        <item name="boxStrokeColor">@color/olive</item>
+        <item name="boxStrokeErrorColor">@color/olive</item>
+        <item name="errorTextColor">@color/red</item>
+    </style>
+
+    <style name="MaterialButton" parent="Widget.Material3.Button">
+        <item name="android:width">200dp</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="backgroundTint">@color/olive</item>
+    </style>
+
 
 </resources>

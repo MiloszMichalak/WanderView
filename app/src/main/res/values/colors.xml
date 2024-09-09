@@ -5,7 +5,7 @@
     <color name="grey">#3C3D37</color>
     <color name="olive">#697565</color>
     <color name="beige">#ECDFCC</color>
-    <color name="beige_light">#CBECDFCC</color>
+    <color name="darker_beige">#CBECDFCC</color>
     <color name="white">#FDFDFD</color>
     <color name="red">#CC0000</color>
 </resources>

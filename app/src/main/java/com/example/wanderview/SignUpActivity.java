@@ -2,10 +2,7 @@ package com.example.wanderview;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Patterns;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -14,12 +11,14 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.material.textfield.TextInputLayout;
+
 
 public class SignUpActivity extends AppCompatActivity {
 
     TextView swapToLogin;
     Button registerBtn;
-    EditText usernameEditText, emailEditText, passwordEditText;
+    TextInputLayout usernameEditText, emailEditText, passwordEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,31 +44,22 @@ public class SignUpActivity extends AppCompatActivity {
         passwordEditText = findViewById(R.id.editTextPassword);
 
         registerBtn.setOnClickListener(v -> {
-            String username = usernameEditText.getText().toString();
-            String email = usernameEditText.getText().toString();
-            String password = passwordEditText.getText().toString();
+            String username = usernameEditText.getEditText().getText().toString().trim();
+            String email = usernameEditText.getEditText().getText().toString().trim();
+            String password = passwordEditText.getEditText().getText().toString().trim();
 
-            if (username.isEmpty()){
-
+            if (Utility.isUsernameValid(username)){
                 usernameEditText.setError(getString(R.string.invalid_username));
             }
 
-            if (isValidEmail(email)){
+            if (Utility.isValidEmail(email)){
                 emailEditText.setError(getString(R.string.invalid_email));
             }
 
-            if (isValidPassword(password)){
+            if (Utility.isValidPassword(password)){
                 passwordEditText.setError(getString(R.string.invalid_password));
             }
 
         });
-    }
-
-    public static boolean isValidEmail(CharSequence email){
-        return (TextUtils.isEmpty(email) || !Patterns.EMAIL_ADDRESS.matcher(email).matches());
-    }
-
-    public static boolean isValidPassword(CharSequence password){
-        return (TextUtils.isEmpty(password) || password.length() < 8);
     }
 }

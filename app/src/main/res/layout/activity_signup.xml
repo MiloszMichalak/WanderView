@@ -7,13 +7,14 @@
     android:layout_height="match_parent"
     tools:context=".SignUpActivity"
     android:orientation="vertical"
-    android:gravity="center_horizontal"
-    android:background="@drawable/background_gradient">
+    android:gravity="center_horizontal">
+
+    <!-- TODO Zbalansowac kolory -->
 
     <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="260dp"
-        android:background="@drawable/mountaing_bg">
+        android:background="@drawable/mountain_bg">
 
         <TextView
             android:id="@+id/welcomeText"
@@ -23,7 +24,8 @@
             android:gravity="center_horizontal"
             android:text="@string/welcome_text"
             android:textSize="26sp"
-            android:layout_gravity="center_horizontal"/>
+            android:layout_gravity="center_horizontal"
+            android:textColor="@color/darker_beige"/>
 
     </FrameLayout>
 
@@ -38,64 +40,61 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:boxStrokeColor="@color/olive"
-        app:cursorColor="@color/beige_light"
-        app:boxCornerRadiusTopStart="20dp"
-        app:boxCornerRadiusTopEnd="20dp"
-        app:boxCornerRadiusBottomStart="20dp"
-        app:boxCornerRadiusBottomEnd="20dp"
-        app:errorEnabled="true">
+        style="@style/FilledBox"
+        android:id="@+id/editTextUsername">
 
-        <!-- Poprawic napewno material edittexta zeby mial normalna ramke-->
+        <!-- TODO Dodac ikonki do edittext
+             TODO Dodac podglad hasla
+             TODO Dodac mniejszy editext-->
 
         <EditText
-            android:id="@+id/editTextUsername"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:autofillHints="username"
             android:hint="@string/username"
-            android:inputType="text"
-            android:minHeight="48dp" />
+            android:inputType="text"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        style="@style/FilledBox"
+        android:id="@+id/editTextEmail">
 
         <EditText
-            android:id="@+id/editTextEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:autofillHints="emailAddress"
             android:hint="@string/email"
-            android:inputType="textEmailAddress"
-            android:minHeight="48dp" />
+            android:inputType="textEmailAddress" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        style="@style/FilledBox"
+        android:id="@+id/editTextPassword">
 
         <EditText
-            android:id="@+id/editTextPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:autofillHints="password"
             android:hint="@string/password"
-            android:inputType="textPassword"
-            android:minHeight="48dp" />
+            android:inputType="textPassword" />
     </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>
 
-    <androidx.appcompat.widget.AppCompatButton
+    <com.google.android.material.button.MaterialButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/round_border"
         android:text="@string/register"
-        android:layout_marginTop="50dp"
-        android:width="160dp"
-        android:id="@+id/registerButton"/>
+        android:layout_marginTop="30dp"
+        android:width="200dp"
+        android:id="@+id/registerButton"
+        app:backgroundTint="@color/olive"
+        android:textSize="15sp"
+        android:textColor="@color/white"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
