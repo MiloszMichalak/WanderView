@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -35,27 +36,32 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/FilledBox">
-                <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textPassword"
-                    android:autofillHints="password"
-                    android:hint="@string/password"
-                    android:id="@+id/editTextPassword"/>
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/FilledBox">
+                style="@style/FilledBox"
+                app:startIconDrawable="@drawable/email_icon"
+                android:id="@+id/editTextEmail">
                 <EditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textEmailAddress"
                     android:autofillHints="emailAddress"
                     android:hint="@string/email"
-                    android:id="@+id/editTextEmail" />
+                    android:id="@+id/emailEdit"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/FilledBox"
+                app:startIconDrawable="@drawable/padlock_icon"
+                app:endIconMode="password_toggle"
+                android:id="@+id/editTextPassword">
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:autofillHints="password"
+                    android:hint="@string/password"
+                    android:id="@+id/passwordEdit"/>
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 

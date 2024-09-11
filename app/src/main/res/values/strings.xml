@@ -10,8 +10,12 @@
     <string name="sign_up">Sign up</string>
     <string name="old_user">You have account?</string>
     <string name="welcome_back_text">Welcome back in WanderView world</string>
-    <string name="invalid_username">Invalid username</string>
+    <string name="invalid_username">Username must have between 3 and 20 chars</string>
     <string name="invalid_email">Invalid email</string>
     <string name="invalid_password">Password must have minimum 8 characters</string>
     <string name="invalid_data">Invalid email or password</string>
+    <string name="email_send">Sent verification email</string>
+    <string name="must_verify">You must verify email</string>
+    <string name="error_message">Invalid email or password</string>
+    <string name="logout">Log out</string>
 </resources>
