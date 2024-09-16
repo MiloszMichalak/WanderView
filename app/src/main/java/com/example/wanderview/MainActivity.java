@@ -2,21 +2,24 @@ package com.example.wanderview;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     FloatingActionButton addImageBtn;
     FirebaseStorage storage;
     StorageReference storageReference;
+    RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,12 +51,6 @@ public class MainActivity extends AppCompatActivity {
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
-        StorageReference storageReference1 = storage.getReference().child("Odanek/");
-
-        ImageView imageView = findViewById(R.id.imageTemp);
-
-        Glide.with(this).load(storageReference1).into(imageView);
-
         logOutBtn.setOnClickListener(v -> {
             mAuth.signOut();
             startActivity(new Intent(getApplicationContext(), LogInActivity.class));
@@ -61,6 +59,33 @@ public class MainActivity extends AppCompatActivity {
 
         addImageBtn.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), AddingImageActivity.class)));
 
+        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
 
+        fetchImagesFromStorage(storageReference);
+    }
+
+    // TODO wyswietlanie danych od kazdego uzytkownika sa pod soba a nie w sobie
+    public void fetchImagesFromStorage(StorageReference storageReference){
+        List<ImageModel> imageModels = new ArrayList<>();
+        storageReference.listAll().addOnSuccessListener(listResult -> {
+            for (StorageReference item : listResult.getItems()){
+                item.getMetadata().addOnSuccessListener(metadata -> {
+                    String title = metadata.getCustomMetadata("title");
+                    item.getDownloadUrl().addOnSuccessListener(uri -> {
+                        imageModels.add(new ImageModel(uri.toString(), title != null ? title : "Ni ma titla"));
+                        if (imageModels.size() == listResult.getItems().size()){
+                            ImageAdapter adapter = new ImageAdapter(getApplicationContext(), imageModels);
+                            recyclerView.setAdapter(adapter);
+                        }
+                    });
+                });
+            }
+            for (StorageReference prefix : listResult.getPrefixes()){
+                fetchImagesFromStorage(prefix);
+            }
+        }).addOnFailureListener(e -> {
+
+        });
     }
 }

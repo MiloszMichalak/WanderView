@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
@@ -83,18 +82,21 @@ public class AddingImageActivity extends AppCompatActivity {
             byte[] data = baos.toByteArray();
             title = imageTitleEdit.getEditText().getText().toString();
 
-            StorageMetadata metadata = new StorageMetadata.Builder()
-                    .setCustomMetadata("Title", title)
-                    .build();
-
             // TODO jak nie ma imageview to po prostu ze nie ma a nie ze wylacza activity
-            if (data.length != 0 || TextUtils.isEmpty(title)){
-                storageReference.child(currentUser.getDisplayName()+"/").child(fileName).putBytes(data)
-                        .addOnFailureListener(exception -> {
-                }).addOnSuccessListener(taskSnapshot -> finish());
+            if (data.length > 0 && !TextUtils.isEmpty(title)){
+                storageReference = storageReference.child(currentUser.getDisplayName()+"/").child(fileName);
 
-                storageReference.child(currentUser.getDisplayName()+"/").child(fileName).updateMetadata(metadata)
-                        .addOnSuccessListener(storageMetadata -> Toast.makeText(getApplicationContext(), "Dodano metadata", Toast.LENGTH_SHORT).show());
+                storageReference.putBytes(data)
+                        .addOnFailureListener(exception -> {
+                }).addOnSuccessListener(taskSnapshot -> {
+                            StorageMetadata metadata = new StorageMetadata.Builder()
+                                    .setCustomMetadata("author", currentUser.getDisplayName())
+                                    .setCustomMetadata("title", title)
+                                    .build();
+                            storageReference.updateMetadata(metadata)
+                                    .addOnSuccessListener(storageMetadata -> { });
+                            finish();
+                        });
             }
         });
     }
