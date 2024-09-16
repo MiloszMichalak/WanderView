@@ -18,4 +18,7 @@
     <string name="must_verify">You must verify email</string>
     <string name="error_message">Invalid email or password</string>
     <string name="logout">Log out</string>
+    <string name="add_image">Add image</string>
+    <string name="upload_image">Upload image</string>
+    <string name="add_title">Add title\n</string>
 </resources>

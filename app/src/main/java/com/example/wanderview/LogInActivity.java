@@ -94,7 +94,7 @@ public class LogInActivity extends AppCompatActivity {
                             finish();
                         }
                     } else {
-                        editTextEmail.setError("");
+                        editTextEmail.setError("\t");
                         editTextPassword.setError(getString(R.string.invalid_data));
                     }
                 });
