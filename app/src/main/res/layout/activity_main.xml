@@ -12,11 +12,13 @@
         android:layout_height="wrap_content"
         style="@style/MaterialButton"
         android:text="@string/logout"
-        android:id="@+id/logOutBtn" />
+        android:id="@+id/logOutBtn"
+        android:layout_alignParentTop="true"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/logOutBtn"
         android:id="@+id/recyclerView"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -29,12 +31,5 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:outlineSpotShadowColor="@color/white" />
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/imageTemp"/>
-
-
 
 </RelativeLayout>

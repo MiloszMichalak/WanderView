@@ -40,6 +40,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                 .into(holder.imageView);
 
         holder.textView.setText(item.getTitle());
+        holder.textView2.setText(item.getAuthor());
     }
 
     @Override
@@ -49,11 +50,12 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
-        TextView textView;
+        TextView textView, textView2;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.imageView);
             textView = itemView.findViewById(R.id.imageTitle);
+            textView2 = itemView.findViewById(R.id.imageAuthor);
         }
     }
 }

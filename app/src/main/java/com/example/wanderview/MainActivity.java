@@ -65,15 +65,17 @@ public class MainActivity extends AppCompatActivity {
         fetchImagesFromStorage(storageReference);
     }
 
-    // TODO wyswietlanie danych od kazdego uzytkownika sa pod soba a nie w sobie
+    // TODO na biezaco update plikow
+    List<ImageModel> imageModels = new ArrayList<>();
+
     public void fetchImagesFromStorage(StorageReference storageReference){
-        List<ImageModel> imageModels = new ArrayList<>();
         storageReference.listAll().addOnSuccessListener(listResult -> {
             for (StorageReference item : listResult.getItems()){
                 item.getMetadata().addOnSuccessListener(metadata -> {
                     String title = metadata.getCustomMetadata("title");
+                    String author = metadata.getCustomMetadata("author");
                     item.getDownloadUrl().addOnSuccessListener(uri -> {
-                        imageModels.add(new ImageModel(uri.toString(), title != null ? title : "Ni ma titla"));
+                        imageModels.add(new ImageModel(uri.toString(), title != null ? title : "Ni ma titla", author != null ? author : "ni ma autora"));
                         if (imageModels.size() == listResult.getItems().size()){
                             ImageAdapter adapter = new ImageAdapter(getApplicationContext(), imageModels);
                             recyclerView.setAdapter(adapter);

@@ -87,8 +87,8 @@ public class AddingImageActivity extends AppCompatActivity {
                 storageReference = storageReference.child(currentUser.getDisplayName()+"/").child(fileName);
 
                 storageReference.putBytes(data)
-                        .addOnFailureListener(exception -> {
-                }).addOnSuccessListener(taskSnapshot -> {
+                        .addOnFailureListener(exception -> { })
+                        .addOnSuccessListener(taskSnapshot -> {
                             StorageMetadata metadata = new StorageMetadata.Builder()
                                     .setCustomMetadata("author", currentUser.getDisplayName())
                                     .setCustomMetadata("title", title)

@@ -20,4 +20,5 @@
     <string name="add_image">Dodaj zdjęcie</string>
     <string name="upload_image">Wrzuć zdjecie</string>
     <string name="add_title">Dodaj tytuł</string>
+    <string name="landscape_image">Zdjęcie krajobrazu</string>
 </resources>
