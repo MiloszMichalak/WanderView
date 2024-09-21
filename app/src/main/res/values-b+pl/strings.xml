@@ -21,4 +21,6 @@
     <string name="upload_image">Wrzuć zdjecie</string>
     <string name="add_title">Dodaj tytuł</string>
     <string name="landscape_image">Zdjęcie krajobrazu</string>
+    <string name="user_picture">Zdjęcie profilowe użytkownika</string>
+    <string name="your_photos">Twoje zdjęcia</string>
 </resources>

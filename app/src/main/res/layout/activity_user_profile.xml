@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".UserProfileActivity"
+    android:layout_margin="10dp">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:contentDescription="@string/user_picture"
+        android:id="@+id/imageView"
+        android:layout_marginTop="20dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/userName"
+        android:textSize="25sp"
+        android:layout_below="@id/imageView"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/your_photos"
+        android:textSize="20sp"
+        android:layout_below="@id/userName"
+        android:id="@+id/userPostsText"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/imageList"
+        android:layout_below="@id/userPostsText"/>
+
+</RelativeLayout>

@@ -22,4 +22,6 @@
     <string name="upload_image">Upload image</string>
     <string name="add_title">Add title\n</string>
     <string name="landscape_image">landscape image</string>
+    <string name="user_picture">User profile picture</string>
+    <string name="your_photos">Your photos</string>
 </resources>

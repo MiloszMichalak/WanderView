@@ -6,22 +6,36 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    android:layout_marginTop="20dp"
     android:layout_marginBottom="20dp">
 
-    <com.google.android.material.button.MaterialButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/MaterialButton"
-        android:text="@string/logout"
-        android:id="@+id/logOutBtn"
-        android:layout_alignParentTop="true"/>
-
-    <androidx.recyclerview.widget.RecyclerView
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/logOutBtn"
-        android:id="@+id/recyclerView"/>
+        android:layout_height="match_parent">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.Toolbar
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:background="@color/colorPrimary"
+                app:layout_scrollFlags="enterAlways|scroll">
+
+                <include layout="@layout/content_main" />
+
+            </androidx.appcompat.widget.Toolbar>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/recyclerView"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addImageBtn"
@@ -33,6 +47,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:outlineSpotShadowColor="@color/colorPrimary"
-        app:tint="@color/darker_beige"/>
+        app:tint="@color/darker_beige"
+        android:layout_marginEnd="10dp"/>
 
 </RelativeLayout>

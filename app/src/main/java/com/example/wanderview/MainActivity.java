@@ -2,6 +2,7 @@ package com.example.wanderview;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.ImageButton;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,7 +12,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.button.MaterialButton;
+import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -25,11 +26,11 @@ public class MainActivity extends AppCompatActivity {
 
     FirebaseAuth mAuth;
     FirebaseUser currentUser;
-    MaterialButton logOutBtn;
     FloatingActionButton addImageBtn;
     FirebaseStorage storage;
     StorageReference storageReference;
     RecyclerView recyclerView;
+    ImageButton userProfileSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,22 +46,21 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
 
-        logOutBtn = findViewById(R.id.logOutBtn);
         addImageBtn = findViewById(R.id.addImageBtn);
 
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
-        logOutBtn.setOnClickListener(v -> {
-            mAuth.signOut();
-            startActivity(new Intent(getApplicationContext(), LogInActivity.class));
-            finish();
-        });
-
         addImageBtn.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), AddingImageActivity.class)));
 
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
+
+        userProfileSettings = findViewById(R.id.userProfileImage);
+
+        Glide.with(this).load(currentUser.getPhotoUrl()).error(R.drawable.profile_default).into(userProfileSettings);
+
+        userProfileSettings.setOnClickListener(v -> startActivity(new Intent(this, UserProfileActivity.class)));
 
         fetchImagesFromStorage(storageReference);
     }
@@ -79,8 +79,11 @@ public class MainActivity extends AppCompatActivity {
 
                     if (!author.equals(currentUser.getDisplayName())){
                         item.getDownloadUrl().addOnSuccessListener(uri -> {
-
-                            imageModels.add(new ImageModel(uri.toString(), title != null ? title : "Ni ma titla", author));
+                            // TODO zmiana error na @string a nie ni ma titla
+                            imageModels.add(new ImageModel(uri.toString(),
+                                    title != null ? title : "Ni ma titla",
+                                    author,
+                                    currentUser.getPhotoUrl()));
 
                             if (imageModels.size() == listResult.getItems().size()){
                                 ImageAdapter adapter = new ImageAdapter(getApplicationContext(), imageModels);

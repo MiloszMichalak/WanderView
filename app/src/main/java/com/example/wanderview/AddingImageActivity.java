@@ -52,6 +52,15 @@ public class AddingImageActivity extends AppCompatActivity {
             return insets;
         });
 
+        ActivityResultLauncher<PickVisualMediaRequest> pickImage =
+                registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri ->{
+                    if (uri != null){
+                        imageView.setImageURI(uri);
+                        fileName = getPhotoNameFromUri(uri);
+                    }
+                });
+
+
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
@@ -62,14 +71,6 @@ public class AddingImageActivity extends AppCompatActivity {
         uploadImage = findViewById(R.id.uploadImage);
 
         imageTitleEdit = findViewById(R.id.imageTitle);
-
-        ActivityResultLauncher<PickVisualMediaRequest> pickImage =
-                registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri ->{
-                    if (uri != null){
-                        imageView.setImageURI(uri);
-                        fileName = getPhotoNameFromUri(uri);
-                    }
-                });
 
         imageView.setOnClickListener(v -> pickImage.launch(new PickVisualMediaRequest.Builder().
                 setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)

@@ -41,6 +41,12 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
         holder.textView.setText(item.getTitle());
         holder.textView2.setText(item.getAuthor());
+
+        Glide.with(context)
+                .load(item.getUserProfileImage())
+                .error(R.drawable.profile_default)
+                .into(holder.userProfileImage);
+
     }
 
     @Override
@@ -51,11 +57,13 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
         TextView textView, textView2;
+        ImageView userProfileImage;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.imageView);
             textView = itemView.findViewById(R.id.imageTitle);
             textView2 = itemView.findViewById(R.id.imageAuthor);
+            userProfileImage = itemView.findViewById(R.id.userProfileImage);
         }
     }
 }
