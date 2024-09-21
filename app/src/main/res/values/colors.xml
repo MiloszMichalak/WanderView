@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="colorAccent">#3C3D37</color>
+    <color name="colorSecondary">#697565</color>
+    <color name="colorPrimary">#ECDFCC</color>
     <color name="black">#0A0A0A</color>
-    <color name="dark_blue">#1E201E</color>
-    <color name="grey">#3C3D37</color>
-    <color name="olive">#697565</color>
-    <color name="beige">#ECDFCC</color>
-    <color name="darker_beige">#CBECDFCC</color>
     <color name="white">#FDFDFD</color>
+    <color name="dark_blue">#1E201E</color>
+    <color name="darker_beige">#CBBBA0</color>
     <color name="red">#CC0000</color>
 </resources>

@@ -65,22 +65,29 @@ public class MainActivity extends AppCompatActivity {
         fetchImagesFromStorage(storageReference);
     }
 
-    // TODO na biezaco update plikow
     List<ImageModel> imageModels = new ArrayList<>();
 
     public void fetchImagesFromStorage(StorageReference storageReference){
+
         storageReference.listAll().addOnSuccessListener(listResult -> {
+
             for (StorageReference item : listResult.getItems()){
                 item.getMetadata().addOnSuccessListener(metadata -> {
+
                     String title = metadata.getCustomMetadata("title");
                     String author = metadata.getCustomMetadata("author");
-                    item.getDownloadUrl().addOnSuccessListener(uri -> {
-                        imageModels.add(new ImageModel(uri.toString(), title != null ? title : "Ni ma titla", author != null ? author : "ni ma autora"));
-                        if (imageModels.size() == listResult.getItems().size()){
-                            ImageAdapter adapter = new ImageAdapter(getApplicationContext(), imageModels);
-                            recyclerView.setAdapter(adapter);
-                        }
-                    });
+
+                    if (!author.equals(currentUser.getDisplayName())){
+                        item.getDownloadUrl().addOnSuccessListener(uri -> {
+
+                            imageModels.add(new ImageModel(uri.toString(), title != null ? title : "Ni ma titla", author));
+
+                            if (imageModels.size() == listResult.getItems().size()){
+                                ImageAdapter adapter = new ImageAdapter(getApplicationContext(), imageModels);
+                                recyclerView.setAdapter(adapter);
+                            }
+                        });
+                    }
                 });
             }
             for (StorageReference prefix : listResult.getPrefixes()){

@@ -15,14 +15,12 @@
         android:id="@+id/addImage"/>
 
     <ImageView
+        android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="400dp"
-        android:id="@+id/imageView"
         android:layout_below="@+id/addImage"
-        android:layout_marginTop="30dp"
-        android:contentDescription="@string/add_image"
-        android:scaleType="centerCrop"
-        />
+        android:layout_marginTop="36dp"
+        android:contentDescription="@string/add_image" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="300dp"
