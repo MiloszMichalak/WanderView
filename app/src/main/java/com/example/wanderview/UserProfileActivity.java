@@ -1,36 +1,39 @@
 package com.example.wanderview;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.PickVisualMediaRequest;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class UserProfileActivity extends AppCompatActivity {
 
     ImageView profilePicture;
-    Uri pictureUri;
     FirebaseUser currentUser;
     FirebaseAuth mAuth;
     TextView username;
     FirebaseStorage storage;
     StorageReference storageReference;
     RecyclerView recyclerView;
+    MaterialButton editProfileBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,22 +50,46 @@ public class UserProfileActivity extends AppCompatActivity {
 
         currentUser = mAuth.getCurrentUser();
 
+        recyclerView = findViewById(R.id.imageList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
+
         storage = FirebaseStorage.getInstance();
-        storageReference = storage.getReference(currentUser.getDisplayName()+"/");
+        storageReference = storage.getReference( "UsersPhotos/"+currentUser.getDisplayName()+"/");
 
         profilePicture = findViewById(R.id.imageView);
         username = findViewById(R.id.userName);
 
-        Glide.with(this).load(currentUser.getPhotoUrl()).error(R.drawable.profile_default).into(profilePicture);
+        editProfileBtn = findViewById(R.id.editProfileBtn);
+        editProfileBtn.setOnClickListener(v -> startActivity(new Intent(this, EditProfileActivity.class)));
+
+        Glide.with(this)
+                .load(currentUser.getPhotoUrl())
+                .error(R.drawable.profile_default)
+                .into(profilePicture);
+
         username.setText(currentUser.getDisplayName());
 
+        fetchImagesFromStorage(storageReference);
+    }
 
-        ActivityResultLauncher<PickVisualMediaRequest> pickImage =
-                registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri ->{
-                    if (uri != null){
-                        profilePicture.setImageURI(uri);
-                        pictureUri = uri;
-                    }
+    public void fetchImagesFromStorage(StorageReference storageReference){
+        List<ImageModel> imageModels = new ArrayList<>();
+        storageReference.listAll().addOnSuccessListener(listResult -> {
+            int totalItems = listResult.getItems().size();
+            if (totalItems==0){return;}
+            for (StorageReference item : listResult.getItems()){
+                item.getMetadata().addOnSuccessListener(storageMetadata -> {
+                    String title = storageMetadata.getCustomMetadata("title");
+                    item.getDownloadUrl().addOnSuccessListener(uri -> {
+                       imageModels.add(new ImageModel(uri.toString(),
+                               title != null ? title : getString(R.string.unknown_title),
+                               currentUser.getDisplayName(),
+                               currentUser.getPhotoUrl()));
+                       ImageAdapter adapter = new ImageAdapter(getApplicationContext(), imageModels);
+                       recyclerView.setAdapter(adapter);
+                   });
                 });
+            }
+        });
     }
 }

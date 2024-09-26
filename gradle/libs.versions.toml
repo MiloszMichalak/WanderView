@@ -1,7 +1,9 @@
 [versions]
 agp = "8.6.1"
+androidImagePicker = "1.4.0"
 design = "28.0.0"
 firebaseUiAuth = "7.2.0"
+imagepicker = "2.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
@@ -18,6 +20,7 @@ glide = "4.12.0"
 [libraries]
 design = { module = "com.android.support:design", version.ref = "design" }
 firebase-ui-auth = { module = "com.firebaseui:firebase-ui-auth", version.ref = "firebaseUiAuth" }
+imagepicker = { module = "com.github.dhaval2404:imagepicker", version.ref = "imagepicker" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

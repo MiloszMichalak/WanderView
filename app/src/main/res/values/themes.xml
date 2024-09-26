@@ -5,12 +5,12 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorSecondary">@color/colorSecondary</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:windowBackground">@drawable/light_background_gradient</item>
+        <item name="android:windowBackground">@color/colorPrimary</item>
         <item name="android:fontFamily">@font/signika</item>
     </style>
 
     <style name="Theme.WanderView" parent="Base.Theme.WanderView">
-        <item name="android:textColor">@color/colorAccent</item>
+
     </style>
 
     <style name="FilledBox" parent="Widget.Material3.TextInputLayout.FilledBox">
@@ -21,12 +21,13 @@
         <item name="boxStrokeColor">@color/colorSecondary</item>
         <item name="boxStrokeErrorColor">@color/colorSecondary</item>
         <item name="errorTextColor">@color/red</item>
+
     </style>
 
     <style name="MaterialButton" parent="Widget.Material3.Button">
         <item name="android:width">200dp</item>
         <item name="android:textSize">15sp</item>
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">@color/colorPrimary</item>
         <item name="backgroundTint">@color/colorSecondary</item>
     </style>
 

@@ -18,10 +18,11 @@
             android:layout_centerInParent="true"/>
 
         <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:id="@+id/userProfileImage"
             android:background="@drawable/round_border"
+            android:clipToOutline="true"
             android:contentDescription="@string/user_picture"
             android:layout_alignParentEnd="true"/>
 

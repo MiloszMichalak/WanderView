@@ -23,7 +23,7 @@
             android:text="@string/welcome_back_text"
             android:textSize="24sp"
             android:layout_gravity="center_horizontal"
-            android:textColor="@color/darker_beige"/>
+            android:textColor="@color/beige"/>
 
     </FrameLayout>
 

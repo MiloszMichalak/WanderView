@@ -62,7 +62,7 @@ public class AddingImageActivity extends AppCompatActivity {
 
 
         storage = FirebaseStorage.getInstance();
-        storageReference = storage.getReference();
+        storageReference = storage.getReference("UsersPhotos/");
 
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();

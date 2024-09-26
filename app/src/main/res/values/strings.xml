@@ -24,4 +24,8 @@
     <string name="landscape_image">landscape image</string>
     <string name="user_picture">User profile picture</string>
     <string name="your_photos">Your photos</string>
+    <string name="unknown_title">Unknown title</string>
+    <string name="edit_profile">Edit profile</string>
+    <string name="not_blank_username">Username cannot be blank</string>
+    <string name="save">Save</string>
 </resources>

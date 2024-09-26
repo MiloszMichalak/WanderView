@@ -2,7 +2,9 @@ package com.example.wanderview;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,9 +30,10 @@ public class MainActivity extends AppCompatActivity {
     FirebaseUser currentUser;
     FloatingActionButton addImageBtn;
     FirebaseStorage storage;
-    StorageReference storageReference;
+    StorageReference storageReference, profileImagesStorageReference;
     RecyclerView recyclerView;
     ImageButton userProfileSettings;
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +51,14 @@ public class MainActivity extends AppCompatActivity {
 
         addImageBtn = findViewById(R.id.addImageBtn);
 
+        progressBar = findViewById(R.id.progressBar);
+
         storage = FirebaseStorage.getInstance();
-        storageReference = storage.getReference();
+        storageReference = storage.getReference().child("UsersPhotos/");
+        // TODO pozamykac referencje w utilsy
+        // TODO rewizja kodu
+        profileImagesStorageReference = storage.getReference().child("UsersProfilePhotos/");
+        // TODO jesli user nie ma profilowego ma po prostu ladowac default a nie wywalac bleda
 
         addImageBtn.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), AddingImageActivity.class)));
 
@@ -68,28 +77,35 @@ public class MainActivity extends AppCompatActivity {
     List<ImageModel> imageModels = new ArrayList<>();
 
     public void fetchImagesFromStorage(StorageReference storageReference){
-
         storageReference.listAll().addOnSuccessListener(listResult -> {
-
+            int totalItems = listResult.getItems().size();
             for (StorageReference item : listResult.getItems()){
                 item.getMetadata().addOnSuccessListener(metadata -> {
-
                     String title = metadata.getCustomMetadata("title");
                     String author = metadata.getCustomMetadata("author");
-
                     if (!author.equals(currentUser.getDisplayName())){
-                        item.getDownloadUrl().addOnSuccessListener(uri -> {
-                            // TODO zmiana error na @string a nie ni ma titla
+                        item.getDownloadUrl().addOnSuccessListener(uri -> profileImagesStorageReference.child(author).getDownloadUrl().addOnFailureListener(e -> {
                             imageModels.add(new ImageModel(uri.toString(),
-                                    title != null ? title : "Ni ma titla",
+                                    title != null ? title : getString(R.string.unknown_title),
                                     author,
-                                    currentUser.getPhotoUrl()));
-
-                            if (imageModels.size() == listResult.getItems().size()){
+                                    null));
+                            if (imageModels.size() == totalItems) {
                                 ImageAdapter adapter = new ImageAdapter(getApplicationContext(), imageModels);
                                 recyclerView.setAdapter(adapter);
                             }
-                        });
+                            // TODO tzeba naprawic to cos
+                        }).addOnSuccessListener(uri1 -> {
+                            imageModels.add(new ImageModel(uri.toString(),
+                                    title != null ? title : getString(R.string.unknown_title),
+                                    author,
+                                    uri1));
+                            if (imageModels.size() == totalItems) {
+                                ImageAdapter adapter = new ImageAdapter(getApplicationContext(), imageModels);
+                                recyclerView.setAdapter(adapter);
+                                recyclerView.setVisibility(View.VISIBLE);
+                                progressBar.setVisibility(View.INVISIBLE);
+                            }
+                        }));
                     }
                 });
             }

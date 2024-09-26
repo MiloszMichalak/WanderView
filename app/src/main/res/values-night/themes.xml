@@ -5,15 +5,15 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorSecondary">@color/colorSecondary</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:windowBackground">@drawable/dark_background_gradient</item>
+        <item name="android:windowBackground">@color/colorPrimary</item>
         <item name="android:fontFamily">@font/signika</item>
     </style>
 
     <style name="FilledBox" parent="Widget.Material3.TextInputLayout.FilledBox">
         <item name="errorEnabled">true</item>
-        <item name="cursorColor">@color/darker_beige</item>
+        <item name="cursorColor">@color/beige</item>
         <item name="boxBackgroundColor">@color/colorPrimary</item>
-        <item name="android:textColorHint">@color/darker_beige</item>
+        <item name="android:textColorHint">@color/beige</item>
         <item name="boxStrokeColor">@color/colorSecondary</item>
         <item name="boxStrokeErrorColor">@color/colorSecondary</item>
         <item name="errorTextColor">@color/red</item>
@@ -22,7 +22,7 @@
     <style name="MaterialButton" parent="Widget.Material3.Button">
         <item name="android:width">200dp</item>
         <item name="android:textSize">15sp</item>
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">@color/colorAccent</item>
         <item name="backgroundTint">@color/colorSecondary</item>
     </style>
 
