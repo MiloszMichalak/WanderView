@@ -2,8 +2,6 @@ package com.example.wanderview;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -21,25 +19,24 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AddingImageActivity extends AppCompatActivity {
 
     ImageView imageView;
     MaterialButton uploadImage;
-    FirebaseStorage storage;
     StorageReference storageReference;
     String fileName;
-    FirebaseAuth mAuth;
     FirebaseUser currentUser;
     String title;
     TextInputLayout imageTitleEdit;
+    Uri photoUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,15 +54,15 @@ public class AddingImageActivity extends AppCompatActivity {
                     if (uri != null){
                         imageView.setImageURI(uri);
                         fileName = getPhotoNameFromUri(uri);
+                        photoUri = uri;
                     }
                 });
 
+        currentUser = Utility.getCurrentUser();
 
-        storage = FirebaseStorage.getInstance();
-        storageReference = storage.getReference("UsersPhotos/");
-
-        mAuth = FirebaseAuth.getInstance();
-        currentUser = mAuth.getCurrentUser();
+        storageReference = Utility.getUsersPhotosReference();
+        DatabaseReference databaseReference  = FirebaseDatabase.getInstance("https://wanderview-8b391-default-rtdb.europe-west1.firebasedatabase.app/")
+                .getReference().child("UsersPhotos").child(currentUser.getDisplayName());
 
         imageView = findViewById(R.id.imageView);
         uploadImage = findViewById(R.id.uploadImage);
@@ -77,27 +74,28 @@ public class AddingImageActivity extends AppCompatActivity {
                 .build()));
 
         uploadImage.setOnClickListener(v -> {
-            Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-            byte[] data = baos.toByteArray();
             title = imageTitleEdit.getEditText().getText().toString();
 
-            // TODO jak nie ma imageview to po prostu ze nie ma a nie ze wylacza activity
-            if (data.length > 0 && !TextUtils.isEmpty(title)){
+            if (!TextUtils.isEmpty(title) && photoUri != null){
                 storageReference = storageReference.child(currentUser.getDisplayName()+"/").child(fileName);
 
-                storageReference.putBytes(data)
-                        .addOnFailureListener(exception -> { })
+                storageReference.putFile(photoUri)
                         .addOnSuccessListener(taskSnapshot -> {
-                            StorageMetadata metadata = new StorageMetadata.Builder()
-                                    .setCustomMetadata("author", currentUser.getDisplayName())
-                                    .setCustomMetadata("title", title)
-                                    .build();
-                            storageReference.updateMetadata(metadata)
-                                    .addOnSuccessListener(storageMetadata -> { });
+                            storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
+                               String imageUrl = uri.toString();
+
+                                Map<String, Object> imageMetadata = new HashMap<>() ;
+                                imageMetadata.put("url", imageUrl);
+                                imageMetadata.put("author", currentUser.getDisplayName());
+                                imageMetadata.put("title", title);
+
+                                databaseReference.push().setValue(imageMetadata).addOnSuccessListener(unused -> { });
+                            });
                             finish();
                         });
+            } else {
+                // TODO komunikat ze title nie moze byc pusty
+                imageTitleEdit.setError("blad");
             }
         });
     }

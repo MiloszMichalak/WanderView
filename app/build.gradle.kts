@@ -47,3 +47,6 @@ android {
         androidTestImplementation(libs.espresso.core)
     }
 }
+dependencies {
+    implementation(libs.firebase.database)
+}

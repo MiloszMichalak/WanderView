@@ -18,21 +18,16 @@ import com.bumptech.glide.Glide;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 public class EditProfileActivity extends AppCompatActivity {
 
     TextInputEditText usernameEdit;
     ImageButton userProfileImage;
-    FirebaseAuth mAuth;
     FirebaseUser currentUser;
     ActivityResultLauncher<Intent> imagePickLauncher;
     Uri selectedImageUri;
     MaterialButton saveInfo;
-    FirebaseStorage storage;
     StorageReference storageReference;
 
     @Override
@@ -54,24 +49,25 @@ public class EditProfileActivity extends AppCompatActivity {
                 }
             }
         });
-
+        // TODO zmiana nicku zeby dzialala
         usernameEdit = findViewById(R.id.usernameEdit);
 
         userProfileImage = findViewById(R.id.userProfileImage);
 
         saveInfo = findViewById(R.id.saveInfo);
 
-        mAuth = FirebaseAuth.getInstance();
-        currentUser = mAuth.getCurrentUser();
+        currentUser = Utility.getCurrentUser();
 
-        storage = FirebaseStorage.getInstance();
-        storageReference = storage.getReference().child("UsersProfilePhotos/").child(currentUser.getDisplayName());
+        storageReference = Utility.getUsersProfilePhotosReference().child(currentUser.getDisplayName());
 
         usernameEdit.setText(currentUser.getDisplayName());
-        Glide.with(this)
-                .load(currentUser.getPhotoUrl())
-                .error(R.drawable.profile_default)
-                .into(userProfileImage);
+
+        storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
+            Glide.with(this)
+                    .load(uri)
+                    .error(R.drawable.profile_default)
+                    .into(userProfileImage);
+        });
 
         userProfileImage.setOnClickListener(v -> {
             ImagePicker.with(this)
@@ -81,13 +77,7 @@ public class EditProfileActivity extends AppCompatActivity {
                     .start();
         });
 
-        saveInfo.setOnClickListener(v -> {
-            UserProfileChangeRequest userProfileChangeRequest = new UserProfileChangeRequest.Builder()
-                    .setPhotoUri(selectedImageUri).build();
-
-            currentUser.updateProfile(userProfileChangeRequest).addOnSuccessListener(unused -> { });
-            storageReference.putFile(selectedImageUri).addOnSuccessListener(taskSnapshot -> finish());
-        });
+        saveInfo.setOnClickListener(v -> storageReference.putFile(selectedImageUri).addOnSuccessListener(taskSnapshot -> finish()));
     }
 
     @Override

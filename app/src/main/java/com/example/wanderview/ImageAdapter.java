@@ -1,6 +1,7 @@
 package com.example.wanderview;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,6 +48,15 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                 .error(R.drawable.profile_default)
                 .into(holder.userProfileImage);
 
+        holder.userProfileImage.setOnClickListener(v -> {
+            Intent intent = new Intent(context, UserProfileActivity.class);
+            intent.putExtra("Author", item.getAuthor());
+            if (item.getUserProfileImage() != null){
+                intent.putExtra("AuthorProfileImage", item.getUserProfileImage().toString());
+            }
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        });
     }
 
     @Override

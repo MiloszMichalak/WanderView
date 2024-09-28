@@ -104,9 +104,6 @@ public class SignUpActivity extends AppCompatActivity {
                                 startActivity(new Intent(getApplicationContext(), LogInActivity.class));
                                 finish();
                             }
-//                            else{
-//                                // TODO refused connection
-//                            }
                         });
             }
         });

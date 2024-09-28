@@ -35,8 +35,7 @@
                             android:layout_height="100dp"
                             android:contentDescription="@string/user_picture"
                             android:id="@+id/imageView"
-                            android:layout_marginTop="20dp"
-                            android:background="@drawable/round_border"/>
+                            android:layout_marginTop="20dp"/>
 
                         <TextView
                             android:layout_width="match_parent"
@@ -77,8 +76,18 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/imageList"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:visibility="invisible" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/colorSecondary"
+        android:id="@+id/progressBar"/>
 
 </RelativeLayout>
