@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,7 +10,7 @@
     android:layout_margin="10dp">
 
     <com.google.android.material.button.MaterialButton
-        android:layout_width="80dp"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:text="@string/save"
         style="@style/MaterialButton"
@@ -29,15 +30,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/FilledBox"
-        android:layout_marginTop="100dp">
+        android:layout_marginTop="100dp"
+        app:hintEnabled="false"
+        android:id="@+id/usernameEditLayout">
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:autofillHints="username"
-            android:hint="@string/not_blank_username"
             android:inputType="text"
-            android:id="@+id/usernameEdit"/>
+            android:hint="@string/not_blank_username" />
 
     </com.google.android.material.textfield.TextInputLayout>
 

@@ -11,6 +11,7 @@ import android.widget.ProgressBar;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -59,6 +60,31 @@ public class Utility {
             recyclerView.setAdapter(adapter);
             recyclerView.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.INVISIBLE);
+    }
+
+    public static void disableButton(EditText usernameEdit, MaterialButton saveInfo){
+        usernameEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (count == 0){
+                    saveInfo.setEnabled(false);
+                    saveInfo.setAlpha(0.5f);
+                } else {
+                    saveInfo.setEnabled(true);
+                    saveInfo.setAlpha(1f);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
 
     public static void deleteError(EditText editText, TextInputLayout textInputLayout){

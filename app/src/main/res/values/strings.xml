@@ -16,7 +16,6 @@
     <string name="invalid_data">Invalid email or password</string>
     <string name="email_send">Sent verification email</string>
     <string name="must_verify">You must verify email</string>
-    <string name="error_message">Invalid email or password</string>
     <string name="logout">Log out</string>
     <string name="add_image">Add image</string>
     <string name="upload_image">Upload image</string>
@@ -27,4 +26,7 @@
     <string name="edit_profile">Edit profile</string>
     <string name="not_blank_username">Username cannot be blank</string>
     <string name="save">Save</string>
+    <string name="user_option">User option</string>
+    <string name="taken_email">Email is taken</string>
+    <string name="taken_username">Username is taken</string>
 </resources>

@@ -37,7 +37,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
         Glide.with(context)
                 .load(item.getImageUrl())
-                .error(R.drawable.default_image)
                 .into(holder.imageView);
 
         if (item.getTitle() != null){
@@ -54,10 +53,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
         holder.userProfileImage.setOnClickListener(v -> {
             Intent intent = new Intent(context, UserProfileActivity.class);
-            intent.putExtra("Author", item.getAuthor());
-            if (item.getUserProfileImage() != null){
-                intent.putExtra("AuthorProfileImage", item.getUserProfileImage());
-            }
+            intent.putExtra("Author", item.getUid());
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
         });

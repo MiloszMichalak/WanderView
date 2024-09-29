@@ -3,6 +3,7 @@ package com.example.wanderview;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
@@ -16,7 +17,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.bumptech.glide.Glide;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,7 +26,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 public class EditProfileActivity extends AppCompatActivity {
 
-    TextInputEditText usernameEdit;
+    TextInputLayout usernameEditLayout;
+    EditText usernameEdit;
     ImageView userProfileImage;
     FirebaseUser currentUser;
     Uri profileImageUri;
@@ -47,7 +49,8 @@ public class EditProfileActivity extends AppCompatActivity {
             return insets;
         });
 
-        usernameEdit = findViewById(R.id.usernameEdit);
+        usernameEditLayout = findViewById(R.id.usernameEditLayout);
+        usernameEdit = usernameEditLayout.getEditText();
 
         userProfileImage = findViewById(R.id.userProfileImage);
 
@@ -86,7 +89,8 @@ public class EditProfileActivity extends AppCompatActivity {
                     .start();
         });
 
-        // TODO walidacja czy pusty username, jestli pusty ma byc disablerd button save i hitn ze nie moze byc puste
+        Utility.disableButton(usernameEdit, saveInfo);
+
         saveInfo.setOnClickListener(v -> {
             String username = usernameEdit.getText().toString();
 

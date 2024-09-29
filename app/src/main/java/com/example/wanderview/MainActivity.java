@@ -1,7 +1,6 @@
 package com.example.wanderview;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
@@ -15,6 +14,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -36,10 +36,10 @@ public class MainActivity extends AppCompatActivity {
     ImageButton userProfileSettings;
     ProgressBar progressBar;
     List<ImageModel> imageModels = new ArrayList<>();
-    Uri userProfileImageUri;
     DatabaseReference databaseReference, infoDatabaseReference;
     String username;
     String photoUrl;
+    SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +51,6 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
-        // todo refersh na przesuniecie w gore
 
         currentUser = Utility.getCurrentUser();
 
@@ -87,12 +85,21 @@ public class MainActivity extends AppCompatActivity {
 
         userProfileSettings = findViewById(R.id.userProfileImage);
 
-        userProfileSettings.setOnClickListener(v -> {
-            Intent intent = new Intent(this, UserProfileActivity.class);
-            if (photoUrl != null){
-                intent.putExtra("AuthorProfileImage", photoUrl);
+        userProfileSettings.setOnClickListener(v -> startActivity(new Intent(this, UserProfileActivity.class)));
+
+        swipeRefreshLayout = findViewById(R.id.swipeRefresh);
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                swipeRefreshLayout.setEnabled(!recyclerView.canScrollVertically(-1));
             }
-            startActivity(intent);
+        });
+
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            fetchImagesFromStorage(databaseReference);
+            swipeRefreshLayout.setRefreshing(false);
         });
 
         fetchImagesFromStorage(databaseReference);
@@ -120,7 +127,8 @@ public class MainActivity extends AppCompatActivity {
                                             imageUrl,
                                             title,
                                             snapshot.child("username").getValue(String.class),
-                                            snapshot.child("photoUrl").getValue(String.class)
+                                            snapshot.child("photoUrl").getValue(String.class),
+                                            author
                                     ));
                                         Utility.allItemsLoaded(imageModels, recyclerView, getApplicationContext(), progressBar);
                                         Collections.shuffle(imageModels);

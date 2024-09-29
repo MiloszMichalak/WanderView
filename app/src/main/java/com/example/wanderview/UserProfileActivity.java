@@ -1,10 +1,11 @@
 package com.example.wanderview;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -19,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -39,8 +41,9 @@ public class UserProfileActivity extends AppCompatActivity {
     ProgressBar progressBar;
     String author;
     String username;
-    Uri profilePictureUri;
+    String profilePictureUri;
     List<ImageModel> imageModels = new ArrayList<>();
+    ImageButton userOption;
 
 
     @Override
@@ -62,34 +65,29 @@ public class UserProfileActivity extends AppCompatActivity {
         Intent intent = getIntent();
         editProfileBtn = findViewById(R.id.editProfileBtn);
 
-        infoDatabaseReference = Utility.getUsersInfoCollectionReference();
-        databaseReference = Utility.getUsersPhotosCollectionReference().child(currentUser.getUid());
-
         if (intent.getStringExtra("Author") != null){
             author = intent.getStringExtra("Author");
             editProfileBtn.setVisibility(View.INVISIBLE);
+        } else {
+            author = currentUser.getUid();
         }
 
-        if (intent.getStringExtra("AuthorProfileImage") != null){
-            profilePictureUri = Uri.parse(intent.getStringExtra("AuthorProfileImage"));
-        }
+        infoDatabaseReference = Utility.getUsersInfoCollectionReference();
+        databaseReference = Utility.getUsersPhotosCollectionReference().child(author);
 
-        profilePicture = findViewById(R.id.imageView);
         usernameText = findViewById(R.id.userName);
 
-        progressBar = findViewById(R.id.progressBar);
-
-        editProfileBtn.setOnClickListener(v -> startActivity(new Intent(this, EditProfileActivity.class)));
-
-        Glide.with(this)
-                .load(profilePictureUri)
-                .error(R.drawable.profile_default)
-                .into(profilePicture);
-
-        infoDatabaseReference.child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        infoDatabaseReference.child(author).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 author = snapshot.child("username").getValue(String.class);
+
+                profilePictureUri = snapshot.child("photoUrl").getValue(String.class);
+                Glide.with(getApplicationContext())
+                        .load(profilePictureUri)
+                        .error(R.drawable.profile_default)
+                        .into(profilePicture);
+
                 usernameText.setText(author);
             }
 
@@ -98,6 +96,32 @@ public class UserProfileActivity extends AppCompatActivity {
 
             }
         });
+
+        profilePicture = findViewById(R.id.imageView);
+
+        progressBar = findViewById(R.id.progressBar);
+
+        editProfileBtn.setOnClickListener(v -> startActivity(new Intent(this, EditProfileActivity.class)));
+
+        userOption = findViewById(R.id.userOption);
+        userOption.setOnClickListener(v -> {
+            PopupMenu popupMenu = new PopupMenu(this, v);
+            popupMenu.getMenuInflater().inflate(R.menu.popup_menu, popupMenu.getMenu());
+
+            popupMenu.show();
+
+            popupMenu.setOnMenuItemClickListener(item -> {
+                if (item.getItemId() == R.id.option1) {
+                    FirebaseAuth.getInstance().signOut();
+                    Intent logOut = new Intent(this, LogInActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(logOut);
+                    finish();
+                }
+                return false;
+            });
+        });
+
         fetchImagesFromStorage(databaseReference);
     }
 
@@ -116,7 +140,7 @@ public class UserProfileActivity extends AppCompatActivity {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             username = snapshot.child("username").getValue(String.class);
-                            imageModels.add(new ImageModel(imageUrl, title, username, profilePictureUri.toString()));
+                            imageModels.add(new ImageModel(imageUrl, title, username, profilePictureUri));
                             Utility.allItemsLoaded(imageModels, recyclerView, getApplicationContext(), progressBar);
                         }
 

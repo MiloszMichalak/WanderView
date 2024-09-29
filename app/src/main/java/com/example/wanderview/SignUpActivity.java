@@ -8,6 +8,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -16,7 +17,10 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -27,6 +31,7 @@ public class SignUpActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     FirebaseUser currentUser;
     DatabaseReference infoDatabaseReference;
+    boolean isValidData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +74,7 @@ public class SignUpActivity extends AppCompatActivity {
             String email = emailEditText.getEditText().getText().toString().trim();
             String password = passwordEditText.getEditText().getText().toString().trim();
 
-            boolean isValidData = !Utility.isValidEmail(email) && !Utility.isValidPassword(password) && !Utility.isUsernameValid(username);
+            isValidData = !Utility.isValidEmail(email) && !Utility.isValidPassword(password) && !Utility.isUsernameValid(username);
 
             if (Utility.isUsernameValid(username)) {
                 usernameEditText.setError(getString(R.string.invalid_username));
@@ -83,27 +88,45 @@ public class SignUpActivity extends AppCompatActivity {
                 passwordEditText.setError(getString(R.string.invalid_password));
             }
 
-            if (isValidData){
-                mAuth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(this, task -> {
-                            if (task.isSuccessful()) {
-                                currentUser = mAuth.getCurrentUser();
-                                // todo sprawdzac czy email jest zajety jak i username
-                                currentUser.sendEmailVerification().addOnCompleteListener(this, task1 -> {
-                                    if (task1.isSuccessful()){
-                                        Toast.makeText(getApplicationContext(), getString(R.string.email_send), Toast.LENGTH_SHORT).show();
+            infoDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                        if (snapshot.child("username").getValue(String.class).toLowerCase().equals(username.toLowerCase())){
+                            isValidData = false;
+                            usernameEditText.setError(getString(R.string.taken_username));
+                            break;
+                        }
+                    }
+                    if (isValidData){
+                        mAuth.createUserWithEmailAndPassword(email, password)
+                                .addOnCompleteListener(SignUpActivity.this, task -> {
+                                    if (task.isSuccessful()) {
+                                        currentUser = mAuth.getCurrentUser();
+                                        currentUser.sendEmailVerification().addOnCompleteListener(SignUpActivity.this, task1 -> {
+                                            if (task1.isSuccessful()){
+                                                Toast.makeText(getApplicationContext(), getString(R.string.email_send), Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+
+                                        infoDatabaseReference.child(currentUser.getUid()).child("username").setValue(username);
+
+                                        mAuth.signOut();
+
+                                        startActivity(new Intent(getApplicationContext(), LogInActivity.class));
+                                        finish();
+                                    } else {
+                                        emailEditText.setError(getString(R.string.taken_email));
                                     }
                                 });
+                    }
+                }
 
-                                infoDatabaseReference.child(currentUser.getUid()).child ("username").setValue(username);
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
 
-                                mAuth.signOut();
-
-                                startActivity(new Intent(getApplicationContext(), LogInActivity.class));
-                                finish();
-                            }
-                        });
-            }
+                }
+            });
         });
     }
 }

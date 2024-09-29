@@ -42,6 +42,7 @@ android {
         implementation(libs.firebase.ui.auth)
         implementation(libs.glide)
         implementation(libs.imagepicker)
+        implementation(libs.swiperefreshlayout)
         testImplementation(libs.junit)
         androidTestImplementation(libs.ext.junit)
         androidTestImplementation(libs.espresso.core)

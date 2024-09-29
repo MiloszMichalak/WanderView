@@ -13,14 +13,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/three_dots"
+            android:layout_alignParentEnd="true"
+            android:backgroundTint="@color/colorPrimary"
+            android:contentDescription="@string/user_option"
+            android:id="@+id/userOption"/>
+
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:layout_marginTop="20dp"
             android:contentDescription="@string/user_picture" />
-
-<!--        TODO w prawym gornym 3 kropki do wylogowywania-->
 
         <TextView
             android:id="@+id/userName"

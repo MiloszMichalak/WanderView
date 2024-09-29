@@ -8,34 +8,42 @@
     tools:context=".MainActivity"
     android:layout_marginBottom="20dp">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:id="@+id/swipeRefresh">
 
-        <com.google.android.material.appbar.AppBarLayout
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
 
-            <androidx.appcompat.widget.Toolbar
-                android:layout_height="wrap_content"
+            <com.google.android.material.appbar.AppBarLayout
                 android:layout_width="match_parent"
-                android:background="@color/colorPrimary"
-                app:layout_scrollFlags="enterAlways|scroll">
+                android:layout_height="wrap_content">
 
-                <include layout="@layout/content_main" />
+                <androidx.appcompat.widget.Toolbar
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:background="@color/colorPrimary"
+                    app:layout_scrollFlags="enterAlways|scroll">
 
-            </androidx.appcompat.widget.Toolbar>
+                    <include layout="@layout/content_main" />
 
-        </com.google.android.material.appbar.AppBarLayout>
+                </androidx.appcompat.widget.Toolbar>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/recyclerView"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            android:visibility="invisible" />
+            </com.google.android.material.appbar.AppBarLayout>
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/recyclerView"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                android:visibility="invisible" />
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
 
     <ProgressBar
         android:layout_width="wrap_content"

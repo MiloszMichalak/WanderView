@@ -15,7 +15,6 @@
     <string name="invalid_data">Nieprawidłowy email lub hasło</string>
     <string name="email_send">Wysłano email z potwierdzeniem</string>
     <string name="must_verify">Musisz potwierdzić swój email</string>
-    <string name="error_message">Nieprawidłowy email lub hasło</string>
     <string name="logout">Wyloguj</string>
     <string name="add_image">Dodaj zdjęcie</string>
     <string name="upload_image">Wrzuć zdjecie</string>
@@ -26,4 +25,7 @@
     <string name="edit_profile">Edytuj profil</string>
     <string name="not_blank_username">Nazwa nie może być pusta</string>
     <string name="save">Zapisz</string>
+    <string name="user_option">Opcje konta</string>
+    <string name="taken_email">Email jest zajęty</string>
+    <string name="taken_username">Nazwa użytkownika jest zajęta</string>
 </resources>
