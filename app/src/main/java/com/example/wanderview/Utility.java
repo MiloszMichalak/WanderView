@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -28,6 +30,10 @@ public class Utility {
         return (TextUtils.isEmpty(password) || password.length() < 8);
     }
 
+    public static boolean isUsernameValid(CharSequence username) {
+        return (TextUtils.isEmpty(username) || username.length() > 20 || username.length() < 3);
+    }
+
     public static FirebaseUser getCurrentUser(){
         return FirebaseAuth.getInstance().getCurrentUser();
     }
@@ -38,6 +44,14 @@ public class Utility {
 
     public static StorageReference getUsersProfilePhotosReference(){
         return FirebaseStorage.getInstance().getReference("UsersProfilePhotos/");
+    }
+
+    public static DatabaseReference getUsersPhotosCollectionReference(){
+        return FirebaseDatabase.getInstance("https://wanderview-8b391-default-rtdb.europe-west1.firebasedatabase.app/").getReference().child("UsersPhotos");
+    }
+
+    public static DatabaseReference getUsersInfoCollectionReference(){
+        return FirebaseDatabase.getInstance("https://wanderview-8b391-default-rtdb.europe-west1.firebasedatabase.app/").getReference().child("UsersInfo");
     }
 
     public static void checkIfAllItemsLoaded(int totalItems, List<ImageModel> imageModels, RecyclerView recyclerView, Context context, ProgressBar progressBar) {

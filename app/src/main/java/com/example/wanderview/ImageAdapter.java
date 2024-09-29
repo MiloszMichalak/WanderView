@@ -17,7 +17,7 @@ import java.util.List;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
     List<ImageModel> imageModels;
-    Context context;
+    final Context context;
 
     public ImageAdapter(Context context, List<ImageModel> imageModels){
         this.context = context;
@@ -40,7 +40,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                 .error(R.drawable.default_image)
                 .into(holder.imageView);
 
-        holder.textView.setText(item.getTitle());
+        if (item.getTitle() != null){
+            holder.textView.setText(item.getTitle());
+        } else {
+            holder.textView.setVisibility(View.INVISIBLE);
+        }
         holder.textView2.setText(item.getAuthor());
 
         Glide.with(context)
@@ -52,7 +56,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             Intent intent = new Intent(context, UserProfileActivity.class);
             intent.putExtra("Author", item.getAuthor());
             if (item.getUserProfileImage() != null){
-                intent.putExtra("AuthorProfileImage", item.getUserProfileImage().toString());
+                intent.putExtra("AuthorProfileImage", item.getUserProfileImage());
             }
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
@@ -65,9 +69,9 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView imageView;
-        TextView textView, textView2;
-        ImageView userProfileImage;
+        final ImageView imageView;
+        final TextView textView, textView2;
+        final ImageView userProfileImage;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.imageView);

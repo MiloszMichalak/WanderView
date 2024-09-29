@@ -9,6 +9,7 @@ import android.widget.ProgressBar;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -21,9 +22,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,12 +32,14 @@ public class MainActivity extends AppCompatActivity {
 
     FirebaseUser currentUser;
     FloatingActionButton addImageBtn;
-    StorageReference profileImagesStorageReference;
     RecyclerView recyclerView;
     ImageButton userProfileSettings;
     ProgressBar progressBar;
     List<ImageModel> imageModels = new ArrayList<>();
     Uri userProfileImageUri;
+    DatabaseReference databaseReference, infoDatabaseReference;
+    String username;
+    String photoUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,9 +58,25 @@ public class MainActivity extends AppCompatActivity {
 
         progressBar = findViewById(R.id.progressBar);
 
-        profileImagesStorageReference = Utility.getUsersProfilePhotosReference();
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance("https://wanderview-8b391-default-rtdb.europe-west1.firebasedatabase.app/")
-                .getReference().child("UsersPhotos");
+        databaseReference = Utility.getUsersPhotosCollectionReference();
+        infoDatabaseReference = Utility.getUsersInfoCollectionReference();
+
+        infoDatabaseReference.child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                username = snapshot.child("username").getValue(String.class);
+                photoUrl = snapshot.child("photoUrl").getValue(String.class);
+                Glide.with(getApplicationContext())
+                        .load(photoUrl)
+                        .error(R.drawable.profile_default)
+                        .into(userProfileSettings);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         addImageBtn.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), AddingImageActivity.class)));
 
@@ -68,24 +85,15 @@ public class MainActivity extends AppCompatActivity {
 
         userProfileSettings = findViewById(R.id.userProfileImage);
 
-        profileImagesStorageReference.child(currentUser.getDisplayName()).getDownloadUrl().addOnSuccessListener(uri -> {
-            Glide.with(this)
-                    .load(uri)
-                    .error(R.drawable.profile_default)
-                    .into(userProfileSettings);
-            userProfileImageUri = uri;
-        });
-
         userProfileSettings.setOnClickListener(v -> {
             Intent intent = new Intent(this, UserProfileActivity.class);
-            if (currentUser.getPhotoUrl() != null){
+            if (userProfileImageUri != null){
                 intent.putExtra("AuthorProfileImage", userProfileImageUri.toString());
             }
             startActivity(intent);
         });
 
         fetchImagesFromStorage(databaseReference);
-
     }
 
 
@@ -103,24 +111,26 @@ public class MainActivity extends AppCompatActivity {
                         String title = imageSnapshot.child("title").getValue(String.class);
                         String author = imageSnapshot.child("author").getValue(String.class);
 
-                        if (!author.equals(currentUser.getDisplayName())){
-                            profileImagesStorageReference.child(author).getDownloadUrl().addOnFailureListener(e -> {
-                                imageModels.add(new ImageModel(
-                                        imageUrl,
-                                        title != null ? title : getString(R.string.unknown_title),
-                                        author,
-                                        null));
-                                Utility.checkIfAllItemsLoaded(totalUsers, imageModels, recyclerView, getApplicationContext(), progressBar);
-                            }).addOnSuccessListener(uri -> {
-                                imageModels.add(new ImageModel(
-                                        imageUrl,
-                                        title != null ? title : getString(R.string.unknown_title),
-                                        author,
-                                        uri));
-                                Utility.checkIfAllItemsLoaded(totalUsers, imageModels, recyclerView, getApplicationContext(), progressBar);
+                        if (author.equals(currentUser.getUid())){
+                            infoDatabaseReference.child(author).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    imageModels.add(new ImageModel(
+                                            imageUrl,
+                                            title,
+                                            snapshot.child("username").getValue(String.class),
+                                            snapshot.child("photoUrl").getValue(String.class)
+                                    ));
+                                    Utility.checkIfAllItemsLoaded(totalUsers, imageModels, recyclerView, getApplicationContext(), progressBar);
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
                             });
-                            Collections.shuffle(imageModels);
                         }
+                        Collections.shuffle(imageModels);
                     }
 
                 }

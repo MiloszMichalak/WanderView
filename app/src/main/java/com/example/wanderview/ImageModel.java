@@ -1,14 +1,12 @@
 package com.example.wanderview;
 
-import android.net.Uri;
-
 public class ImageModel {
     private final String imageUrl;
     private final String title;
     private final String author;
-    private final Uri userProfileImage;
+    private final String userProfileImage;
 
-    public ImageModel(String imageUrl, String title, String author, Uri userProfileImage){
+    public ImageModel(String imageUrl, String title, String author, String userProfileImage){
         this.imageUrl = imageUrl;
         this.title = title;
         this.author = author;
@@ -25,5 +23,5 @@ public class ImageModel {
 
     public String getAuthor() {return author; }
 
-    public Uri getUserProfileImage() { return userProfileImage; }
+    public String getUserProfileImage() { return userProfileImage; }
 }

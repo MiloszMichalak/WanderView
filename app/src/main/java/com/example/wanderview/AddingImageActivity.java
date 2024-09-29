@@ -5,13 +5,13 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.text.TextUtils;
 import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -20,12 +20,15 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.HashMap;
 import java.util.Map;
+
 
 public class AddingImageActivity extends AppCompatActivity {
 
@@ -37,6 +40,8 @@ public class AddingImageActivity extends AppCompatActivity {
     String title;
     TextInputLayout imageTitleEdit;
     Uri photoUri;
+    DatabaseReference databaseReference, infoDatabaseReference;
+    String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,14 +60,28 @@ public class AddingImageActivity extends AppCompatActivity {
                         imageView.setImageURI(uri);
                         fileName = getPhotoNameFromUri(uri);
                         photoUri = uri;
+                        // TODO Compressor tutaj na zdjecie
                     }
                 });
 
         currentUser = Utility.getCurrentUser();
 
         storageReference = Utility.getUsersPhotosReference();
-        DatabaseReference databaseReference  = FirebaseDatabase.getInstance("https://wanderview-8b391-default-rtdb.europe-west1.firebasedatabase.app/")
-                .getReference().child("UsersPhotos").child(currentUser.getDisplayName());
+
+        infoDatabaseReference = Utility.getUsersInfoCollectionReference().child(currentUser.getUid());
+        infoDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                username = snapshot.child("username").getValue(String.class);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        databaseReference = Utility.getUsersPhotosCollectionReference().child(currentUser.getUid());
 
         imageView = findViewById(R.id.imageView);
         uploadImage = findViewById(R.id.uploadImage);
@@ -76,26 +95,23 @@ public class AddingImageActivity extends AppCompatActivity {
         uploadImage.setOnClickListener(v -> {
             title = imageTitleEdit.getEditText().getText().toString();
 
-            if (!TextUtils.isEmpty(title) && photoUri != null){
-                storageReference = storageReference.child(currentUser.getDisplayName()+"/").child(fileName);
+            if (photoUri != null){
+                storageReference = storageReference.child(currentUser.getUid()).child(fileName);
 
                 storageReference.putFile(photoUri)
                         .addOnSuccessListener(taskSnapshot -> {
                             storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
                                String imageUrl = uri.toString();
 
-                                Map<String, Object> imageMetadata = new HashMap<>() ;
-                                imageMetadata.put("url", imageUrl);
-                                imageMetadata.put("author", currentUser.getDisplayName());
-                                imageMetadata.put("title", title);
+                               Map<String, Object> imageMetadata = new HashMap<>() ;
+                               imageMetadata.put("url", imageUrl);
+                               imageMetadata.put("author", currentUser.getUid());
+                               imageMetadata.put("title", title);
 
-                                databaseReference.push().setValue(imageMetadata).addOnSuccessListener(unused -> { });
+                               databaseReference.push().setValue(imageMetadata).addOnSuccessListener(unused -> { });
                             });
                             finish();
                         });
-            } else {
-                // TODO komunikat ze title nie moze byc pusty
-                imageTitleEdit.setError("blad");
             }
         });
     }

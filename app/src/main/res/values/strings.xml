@@ -20,11 +20,10 @@
     <string name="logout">Log out</string>
     <string name="add_image">Add image</string>
     <string name="upload_image">Upload image</string>
-    <string name="add_title">Add title\n</string>
+    <string name="add_title">Add title</string>
     <string name="landscape_image">landscape image</string>
     <string name="user_picture">User profile picture</string>
     <string name="your_photos">Your photos</string>
-    <string name="unknown_title">Unknown title</string>
     <string name="edit_profile">Edit profile</string>
     <string name="not_blank_username">Username cannot be blank</string>
     <string name="save">Save</string>

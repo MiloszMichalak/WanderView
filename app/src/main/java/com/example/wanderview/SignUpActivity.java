@@ -2,7 +2,6 @@ package com.example.wanderview;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -17,7 +16,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -27,6 +26,7 @@ public class SignUpActivity extends AppCompatActivity {
     EditText usernameEdit, emailEdit, passwordEdit;
     private FirebaseAuth mAuth;
     FirebaseUser currentUser;
+    DatabaseReference infoDatabaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +46,7 @@ public class SignUpActivity extends AppCompatActivity {
         });
 
         mAuth = FirebaseAuth.getInstance();
+        infoDatabaseReference = Utility.getUsersInfoCollectionReference();
 
         registerBtn = findViewById(R.id.registerButton);
 
@@ -68,9 +69,9 @@ public class SignUpActivity extends AppCompatActivity {
             String email = emailEditText.getEditText().getText().toString().trim();
             String password = passwordEditText.getEditText().getText().toString().trim();
 
-            boolean isValidData = !Utility.isValidEmail(email) && !Utility.isValidPassword(password) && !isUsernameValid(username);
+            boolean isValidData = !Utility.isValidEmail(email) && !Utility.isValidPassword(password) && !Utility.isUsernameValid(username);
 
-            if (isUsernameValid(username)) {
+            if (Utility.isUsernameValid(username)) {
                 usernameEditText.setError(getString(R.string.invalid_username));
             }
 
@@ -87,17 +88,14 @@ public class SignUpActivity extends AppCompatActivity {
                         .addOnCompleteListener(this, task -> {
                             if (task.isSuccessful()) {
                                 currentUser = mAuth.getCurrentUser();
-
+                                // todo sprawdzac czy email jest zajety jak i username
                                 currentUser.sendEmailVerification().addOnCompleteListener(this, task1 -> {
                                     if (task1.isSuccessful()){
                                         Toast.makeText(getApplicationContext(), getString(R.string.email_send), Toast.LENGTH_SHORT).show();
                                     }
                                 });
 
-                                UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                        .setDisplayName(username).build();
-
-                                currentUser.updateProfile(profileUpdates).addOnCompleteListener(task2 -> { });
+                                infoDatabaseReference.child(currentUser.getUid()).child ("username").setValue(username);
 
                                 mAuth.signOut();
 
@@ -107,10 +105,5 @@ public class SignUpActivity extends AppCompatActivity {
                         });
             }
         });
-    }
-
-
-    public static boolean isUsernameValid(CharSequence username) {
-        return (TextUtils.isEmpty(username) || username.length() > 20 || username.length() < 3);
     }
 }

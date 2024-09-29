@@ -3,11 +3,10 @@ package com.example.wanderview;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -19,16 +18,23 @@ import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 public class EditProfileActivity extends AppCompatActivity {
 
     TextInputEditText usernameEdit;
-    ImageButton userProfileImage;
+    ImageView userProfileImage;
     FirebaseUser currentUser;
-    ActivityResultLauncher<Intent> imagePickLauncher;
-    Uri selectedImageUri;
+    Uri profileImageUri;
     MaterialButton saveInfo;
-    StorageReference storageReference;
+    StorageReference originalStorageReference;
+    String originalUsername;
+    boolean isPhotoChanged;
+    DatabaseReference infoDatabaseReference;
+    String photoUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,15 +47,6 @@ public class EditProfileActivity extends AppCompatActivity {
             return insets;
         });
 
-        imagePickLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            if (result.getResultCode() == EditProfileActivity.RESULT_OK){
-                Intent data = result.getData();
-                if (data != null && data.getData() != null){
-                    selectedImageUri = data.getData();
-                }
-            }
-        });
-        // TODO zmiana nicku zeby dzialala
         usernameEdit = findViewById(R.id.usernameEdit);
 
         userProfileImage = findViewById(R.id.userProfileImage);
@@ -58,16 +55,28 @@ public class EditProfileActivity extends AppCompatActivity {
 
         currentUser = Utility.getCurrentUser();
 
-        storageReference = Utility.getUsersProfilePhotosReference().child(currentUser.getDisplayName());
+        infoDatabaseReference = Utility.getUsersInfoCollectionReference().child(currentUser.getUid());
 
-        usernameEdit.setText(currentUser.getDisplayName());
+        infoDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                originalUsername = snapshot.child("username").getValue(String.class);
+                usernameEdit.setText(originalUsername);
 
-        storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
-            Glide.with(this)
-                    .load(uri)
-                    .error(R.drawable.profile_default)
-                    .into(userProfileImage);
+                photoUrl = snapshot.child("photoUrl").getValue(String.class);
+                Glide.with(getApplicationContext())
+                        .load(photoUrl)
+                        .error(R.drawable.profile_default)
+                        .into(userProfileImage);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
         });
+
+        originalStorageReference = Utility.getUsersProfilePhotosReference().child(currentUser.getUid());
 
         userProfileImage.setOnClickListener(v -> {
             ImagePicker.with(this)
@@ -77,17 +86,34 @@ public class EditProfileActivity extends AppCompatActivity {
                     .start();
         });
 
-        saveInfo.setOnClickListener(v -> storageReference.putFile(selectedImageUri).addOnSuccessListener(taskSnapshot -> finish()));
+        // TODO walidacja czy pusty username, jestli pusty ma byc disablerd button save i hitn ze nie moze byc puste
+        saveInfo.setOnClickListener(v -> {
+            String username = usernameEdit.getText().toString();
+
+            if (!username.equals(originalUsername)){
+                infoDatabaseReference.child("username").setValue(username);
+            }
+
+            if (isPhotoChanged){
+                originalStorageReference.putFile(profileImageUri).addOnSuccessListener(taskSnapshot -> {
+                    originalStorageReference.getDownloadUrl().addOnSuccessListener(uri -> {
+                       infoDatabaseReference.child("photoUrl").setValue(uri.toString());
+                    });
+                });
+            }
+            finish();
+        });
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (data.getData() != null){
-            selectedImageUri = data.getData();
+            profileImageUri = data.getData();
+            isPhotoChanged = true;
 
             Glide.with(this)
-                    .load(selectedImageUri)
+                    .load(profileImageUri)
                     .into(userProfileImage);
         }
     }

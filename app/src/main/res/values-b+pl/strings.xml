@@ -23,7 +23,6 @@
     <string name="landscape_image">Zdjęcie krajobrazu</string>
     <string name="user_picture">Zdjęcie profilowe użytkownika</string>
     <string name="your_photos">Twoje zdjęcia</string>
-    <string name="unknown_title">Nieznany tytuł</string>
     <string name="edit_profile">Edytuj profil</string>
     <string name="not_blank_username">Nazwa nie może być pusta</string>
     <string name="save">Zapisz</string>
