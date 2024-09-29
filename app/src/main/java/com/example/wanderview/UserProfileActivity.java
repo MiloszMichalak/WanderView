@@ -106,7 +106,6 @@ public class UserProfileActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 imageModels.clear();
-                int totalUsers = (int)dataSnapshot.getChildrenCount();
 
                 for (DataSnapshot imageSnapshot : dataSnapshot.getChildren()){
                     String imageUrl = imageSnapshot.child("url").getValue(String.class);
@@ -118,7 +117,7 @@ public class UserProfileActivity extends AppCompatActivity {
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             username = snapshot.child("username").getValue(String.class);
                             imageModels.add(new ImageModel(imageUrl, title, username, profilePictureUri.toString()));
-                            Utility.checkIfAllItemsLoaded(totalUsers, imageModels, recyclerView, getApplicationContext(), progressBar);
+                            Utility.allItemsLoaded(imageModels, recyclerView, getApplicationContext(), progressBar);
                         }
 
                         @Override
@@ -128,7 +127,6 @@ public class UserProfileActivity extends AppCompatActivity {
                     });
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 

@@ -52,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        // todo refersh na przesuniecie w gore
+
         currentUser = Utility.getCurrentUser();
 
         addImageBtn = findViewById(R.id.addImageBtn);
@@ -87,8 +89,8 @@ public class MainActivity extends AppCompatActivity {
 
         userProfileSettings.setOnClickListener(v -> {
             Intent intent = new Intent(this, UserProfileActivity.class);
-            if (userProfileImageUri != null){
-                intent.putExtra("AuthorProfileImage", userProfileImageUri.toString());
+            if (photoUrl != null){
+                intent.putExtra("AuthorProfileImage", photoUrl);
             }
             startActivity(intent);
         });
@@ -102,7 +104,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 imageModels.clear();
-                int totalUsers = (int) dataSnapshot.getChildrenCount();
 
                 for (DataSnapshot userSnapshot : dataSnapshot.getChildren()){
 
@@ -111,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
                         String title = imageSnapshot.child("title").getValue(String.class);
                         String author = imageSnapshot.child("author").getValue(String.class);
 
-                        if (author.equals(currentUser.getUid())){
+                        if (!author.equals(currentUser.getUid())){
                             infoDatabaseReference.child(author).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -121,7 +122,8 @@ public class MainActivity extends AppCompatActivity {
                                             snapshot.child("username").getValue(String.class),
                                             snapshot.child("photoUrl").getValue(String.class)
                                     ));
-                                    Utility.checkIfAllItemsLoaded(totalUsers, imageModels, recyclerView, getApplicationContext(), progressBar);
+                                        Utility.allItemsLoaded(imageModels, recyclerView, getApplicationContext(), progressBar);
+                                        Collections.shuffle(imageModels);
                                 }
 
                                 @Override
@@ -130,9 +132,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             });
                         }
-                        Collections.shuffle(imageModels);
                     }
-
                 }
             }
 

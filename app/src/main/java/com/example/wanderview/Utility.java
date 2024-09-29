@@ -54,14 +54,13 @@ public class Utility {
         return FirebaseDatabase.getInstance("https://wanderview-8b391-default-rtdb.europe-west1.firebasedatabase.app/").getReference().child("UsersInfo");
     }
 
-    public static void checkIfAllItemsLoaded(int totalItems, List<ImageModel> imageModels, RecyclerView recyclerView, Context context, ProgressBar progressBar) {
-        if (imageModels.size() == totalItems) {
+    public static void allItemsLoaded(List<ImageModel> imageModels, RecyclerView recyclerView, Context context, ProgressBar progressBar) {
             ImageAdapter adapter = new ImageAdapter(context, imageModels);
             recyclerView.setAdapter(adapter);
             recyclerView.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.INVISIBLE);
-        }
     }
+
     public static void deleteError(EditText editText, TextInputLayout textInputLayout){
         editText.addTextChangedListener(new TextWatcher() {
             @Override
