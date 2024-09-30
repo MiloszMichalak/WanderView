@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
                                             snapshot.child("photoUrl").getValue(String.class),
                                             author
                                     ));
-                                        Utility.allItemsLoaded(imageModels, recyclerView, getApplicationContext(), progressBar);
+                                        Utility.allItemsLoaded(imageModels, recyclerView, getApplicationContext(), progressBar, true);
                                         Collections.shuffle(imageModels);
                                 }
 

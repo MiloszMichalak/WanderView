@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -20,7 +21,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class Utility {
     public static boolean isValidEmail(CharSequence email){
@@ -55,11 +59,18 @@ public class Utility {
         return FirebaseDatabase.getInstance("https://wanderview-8b391-default-rtdb.europe-west1.firebasedatabase.app/").getReference().child("UsersInfo");
     }
 
-    public static void allItemsLoaded(List<ImageModel> imageModels, RecyclerView recyclerView, Context context, ProgressBar progressBar) {
-            ImageAdapter adapter = new ImageAdapter(context, imageModels);
-            recyclerView.setAdapter(adapter);
-            recyclerView.setVisibility(View.VISIBLE);
-            progressBar.setVisibility(View.INVISIBLE);
+    public static String timestampToDate(Timestamp timestamp){
+        Date date = timestamp.toDate();
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+        return simpleDateFormat.format(date);
+    }
+
+    public static void allItemsLoaded(List<ImageModel> imageModels, RecyclerView recyclerView, Context context, ProgressBar progressBar, boolean isClickable) {
+        ImageAdapter adapter = new ImageAdapter(context, imageModels, isClickable);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.INVISIBLE);
     }
 
     public static void disableButton(EditText usernameEdit, MaterialButton saveInfo){

@@ -65,9 +65,12 @@ public class UserProfileActivity extends AppCompatActivity {
         Intent intent = getIntent();
         editProfileBtn = findViewById(R.id.editProfileBtn);
 
+        userOption = findViewById(R.id.userOption);
+
         if (intent.getStringExtra("Author") != null){
             author = intent.getStringExtra("Author");
             editProfileBtn.setVisibility(View.INVISIBLE);
+            userOption.setVisibility(View.INVISIBLE);
         } else {
             author = currentUser.getUid();
         }
@@ -103,7 +106,6 @@ public class UserProfileActivity extends AppCompatActivity {
 
         editProfileBtn.setOnClickListener(v -> startActivity(new Intent(this, EditProfileActivity.class)));
 
-        userOption = findViewById(R.id.userOption);
         userOption.setOnClickListener(v -> {
             PopupMenu popupMenu = new PopupMenu(this, v);
             popupMenu.getMenuInflater().inflate(R.menu.popup_menu, popupMenu.getMenu());
@@ -141,7 +143,7 @@ public class UserProfileActivity extends AppCompatActivity {
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             username = snapshot.child("username").getValue(String.class);
                             imageModels.add(new ImageModel(imageUrl, title, username, profilePictureUri));
-                            Utility.allItemsLoaded(imageModels, recyclerView, getApplicationContext(), progressBar);
+                            Utility.allItemsLoaded(imageModels, recyclerView, getApplicationContext(), progressBar, false);
                         }
 
                         @Override

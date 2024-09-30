@@ -13,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+<!--        todo to to trzeba chowac tego buttona u kogos a nie-->
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -46,6 +47,9 @@
             android:layout_below="@id/userName"
             android:layout_centerHorizontal="true"
             android:text="@string/edit_profile" />
+
+
+<!--        todo te your photos to tu zbedne cos innego mozna-->
 
         <TextView
             android:id="@+id/userPostsText"

@@ -18,10 +18,12 @@ import java.util.List;
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
     List<ImageModel> imageModels;
     final Context context;
+    boolean isClickable = true;
 
-    public ImageAdapter(Context context, List<ImageModel> imageModels){
+    public ImageAdapter(Context context, List<ImageModel> imageModels, boolean isClickable){
         this.context = context;
         this.imageModels = imageModels;
+        this.isClickable = isClickable;
     }
 
     @NonNull
@@ -33,6 +35,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ImageAdapter.ViewHolder holder, int position) {
+        holder.userProfileImage.setEnabled(isClickable);
+
         ImageModel item = imageModels.get(position);
 
         Glide.with(context)
