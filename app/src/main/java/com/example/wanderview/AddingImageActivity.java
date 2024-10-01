@@ -19,6 +19,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -103,11 +104,15 @@ public class AddingImageActivity extends AppCompatActivity {
                             storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
                                String imageUrl = uri.toString();
 
+                                // todo przemyslec dzialanie tego dodawania authora do bazy danych jak w kluczu
+                                // todo wyzej jest to samo,  a pozniej pobieranie tego znowu
+
+                                // todo dodawania daty do zdjec
                                Map<String, Object> imageMetadata = new HashMap<>() ;
                                imageMetadata.put("url", imageUrl);
                                imageMetadata.put("author", currentUser.getUid());
                                imageMetadata.put("title", title);
-
+                               imageMetadata.put("date", Timestamp.now().getSeconds());
                                databaseReference.push().setValue(imageMetadata).addOnSuccessListener(unused -> { });
                             });
                             finish();

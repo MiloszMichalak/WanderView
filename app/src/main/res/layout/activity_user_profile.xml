@@ -13,7 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-<!--        todo to to trzeba chowac tego buttona u kogos a nie-->
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -48,24 +47,13 @@
             android:layout_centerHorizontal="true"
             android:text="@string/edit_profile" />
 
-
-<!--        todo te your photos to tu zbedne cos innego mozna-->
-
-        <TextView
-            android:id="@+id/userPostsText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/editProfileBtn"
-            android:layout_marginTop="20dp"
-            android:text="@string/your_photos"
-            android:textSize="30sp" />
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/imageList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="invisible"
-            android:layout_below="@+id/userPostsText"
+            android:layout_below="@+id/editProfileBtn"
+            android:layout_marginTop="20dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
         <ProgressBar

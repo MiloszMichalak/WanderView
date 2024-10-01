@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -29,6 +30,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class UserProfileActivity extends AppCompatActivity {
 
@@ -137,12 +139,13 @@ public class UserProfileActivity extends AppCompatActivity {
                     String imageUrl = imageSnapshot.child("url").getValue(String.class);
                     String author = imageSnapshot.child("author").getValue(String.class);
                     String title = imageSnapshot.child("title").getValue(String.class);
+                    Long timestamp = imageSnapshot.child("date").getValue(Long.class);
 
                     infoDatabaseReference.child(author).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             username = snapshot.child("username").getValue(String.class);
-                            imageModels.add(new ImageModel(imageUrl, title, username, profilePictureUri));
+                            imageModels.add(new ImageModel(imageUrl, title, username, profilePictureUri, timestamp));
                             Utility.allItemsLoaded(imageModels, recyclerView, getApplicationContext(), progressBar, false);
                         }
 

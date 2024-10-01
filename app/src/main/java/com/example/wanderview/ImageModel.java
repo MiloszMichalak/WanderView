@@ -1,25 +1,30 @@
 package com.example.wanderview;
 
+import com.google.firebase.Timestamp;
+
 public class ImageModel {
     private final String imageUrl;
     private final String title;
     private final String author;
     private final String userProfileImage;
     private String uid;
+    long timestamp;
 
-    public ImageModel(String imageUrl, String title, String author, String userProfileImage){
+    public ImageModel(String imageUrl, String title, String author, String userProfileImage, long timestamp){
         this.imageUrl = imageUrl;
         this.title = title;
         this.author = author;
         this.userProfileImage = userProfileImage;
+        this.timestamp = timestamp;
     }
 
-    public ImageModel(String imageUrl, String title, String author, String userProfileImage, String uid){
+    public ImageModel(String imageUrl, String title, String author, String userProfileImage, String uid, long timestamp){
         this.imageUrl = imageUrl;
         this.title = title;
         this.author = author;
         this.userProfileImage = userProfileImage;
         this.uid = uid;
+        this.timestamp = timestamp;
     }
 
     public String getImageUrl() {
@@ -35,4 +40,6 @@ public class ImageModel {
     public String getUserProfileImage() { return userProfileImage; }
 
     public String getUid() { return uid; }
+
+    public long getTimestamp() { return timestamp; }
 }

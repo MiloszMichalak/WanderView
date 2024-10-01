@@ -43,6 +43,7 @@ android {
         implementation(libs.glide)
         implementation(libs.imagepicker)
         implementation(libs.swiperefreshlayout)
+        implementation(libs.yoyo)
         testImplementation(libs.junit)
         androidTestImplementation(libs.ext.junit)
         androidTestImplementation(libs.espresso.core)
@@ -50,4 +51,8 @@ android {
 }
 dependencies {
     implementation(libs.firebase.database)
+    implementation(libs.appcompat)
+    implementation(libs.material)
+    implementation(libs.activity)
+    implementation(libs.constraintlayout)
 }

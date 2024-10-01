@@ -2,6 +2,7 @@ package com.example.wanderview;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 
@@ -18,6 +19,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -87,8 +89,6 @@ public class MainActivity extends AppCompatActivity {
 
         userProfileSettings.setOnClickListener(v -> startActivity(new Intent(this, UserProfileActivity.class)));
 
-        swipeRefreshLayout = findViewById(R.id.swipeRefresh);
-
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
@@ -97,7 +97,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        swipeRefreshLayout = findViewById(R.id.swipeRefresh);
+
         swipeRefreshLayout.setOnRefreshListener(() -> {
+            progressBar.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.INVISIBLE);
             fetchImagesFromStorage(databaseReference);
             swipeRefreshLayout.setRefreshing(false);
         });
@@ -118,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
                         String imageUrl = imageSnapshot.child("url").getValue(String.class);
                         String title = imageSnapshot.child("title").getValue(String.class);
                         String author = imageSnapshot.child("author").getValue(String.class);
+                        Long date = imageSnapshot.child("date").getValue(Long.class);
 
                         if (!author.equals(currentUser.getUid())){
                             infoDatabaseReference.child(author).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -128,7 +133,8 @@ public class MainActivity extends AppCompatActivity {
                                             title,
                                             snapshot.child("username").getValue(String.class),
                                             snapshot.child("photoUrl").getValue(String.class),
-                                            author
+                                            author,
+                                            date
                                     ));
                                         Utility.allItemsLoaded(imageModels, recyclerView, getApplicationContext(), progressBar, true);
                                         Collections.shuffle(imageModels);
