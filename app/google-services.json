@@ -1,13 +1,14 @@
 {
   "project_info": {
     "project_number": "545389497743",
+    "firebase_url": "https://wanderview-8b391-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "wanderview-8b391",
     "storage_bucket": "wanderview-8b391.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:545389497743:android:fbc2a6407575cbea4ccffa",
+        "mobilesdk_app_id": "1:545389497743:android:929cfc5dd22f6eaf4ccffa",
         "android_client_info": {
           "package_name": "com.example.wanderview"
         }

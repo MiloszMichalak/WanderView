@@ -29,4 +29,9 @@
     <string name="user_option">User option</string>
     <string name="taken_email">Email is taken</string>
     <string name="taken_username">Username is taken</string>
+    <string name="time_in_seconds" translatable="false">%1$ds</string>
+    <string name="time_in_minutes" translatable="false">%1$dm</string>
+    <string name="time_in_hours">%1$dh</string>
+    <string name="time_in_days" translatable="false">%1$dd</string>
+
 </resources>

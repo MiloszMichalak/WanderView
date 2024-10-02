@@ -28,4 +28,5 @@
     <string name="user_option">Opcje konta</string>
     <string name="taken_email">Email jest zajęty</string>
     <string name="taken_username">Nazwa użytkownika jest zajęta</string>
+    <string name="time_in_hours">%1$dg</string>
 </resources>

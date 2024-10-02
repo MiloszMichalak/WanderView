@@ -15,6 +15,7 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.Timestamp;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
     List<ImageModel> imageModels;
@@ -50,13 +51,23 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             holder.textView.setVisibility(View.INVISIBLE);
         }
         holder.textView2.setText(item.getAuthor());
-        if (Timestamp.now().getSeconds() - item.getTimestamp() > 3600){
-            holder.imageDate.setText(Utility.timestampToDate(item.getTimestamp(), "dd:MM"));
-        } else {
-            holder.imageDate.setText(Utility.timestampToDate(item.getTimestamp(), "HH:mm"));
-        }
 
-        // todo system bardziej ze ile godzin do 24h ile dni do jakis 7 dni i takie rzeczy
+        long seconds = Timestamp.now().getSeconds() - item.getTimestamp();
+        long minutes = TimeUnit.SECONDS.toMinutes(seconds);
+        long hours = TimeUnit.MINUTES.toHours(minutes);
+        long days = TimeUnit.HOURS.toDays(hours);
+
+        if (seconds < 60){
+            holder.imageDate.setText(context.getString(R.string.time_in_seconds, seconds));
+        } else if (minutes < 60) {
+            holder.imageDate.setText(context.getString(R.string.time_in_minutes, minutes));
+        } else if (hours < 24){
+            holder.imageDate.setText(context.getString(R.string.time_in_hours, hours));
+        } else if (days < 7){
+            holder.imageDate.setText(context.getString(R.string.time_in_days, days));
+        } else {
+            holder.imageDate.setText(Utility.timestampToDate(seconds, "dd:MM"));
+        }
 
         Glide.with(context)
                 .load(item.getUserProfileImage())
