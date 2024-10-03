@@ -9,6 +9,8 @@
     tools:context=".UserProfileActivity"
     android:fillViewport="true">
 
+<!--    todo swipe refresh na ten widok-->
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -51,7 +53,6 @@
             android:id="@+id/imageList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="invisible"
             android:layout_below="@+id/editProfileBtn"
             android:layout_marginTop="20dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />

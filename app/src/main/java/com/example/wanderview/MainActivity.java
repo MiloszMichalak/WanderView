@@ -123,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
                         String title = imageSnapshot.child("title").getValue(String.class);
                         String author = imageSnapshot.child("author").getValue(String.class);
                         Long date = imageSnapshot.child("date").getValue(Long.class);
+                        String key = imageSnapshot.getKey();
 
                         if (!author.equals(currentUser.getUid())){
                             infoDatabaseReference.child(author).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -134,9 +135,10 @@ public class MainActivity extends AppCompatActivity {
                                             snapshot.child("username").getValue(String.class),
                                             snapshot.child("photoUrl").getValue(String.class),
                                             author,
+                                            key,
                                             date
                                     ));
-                                        Utility.allItemsLoaded(imageModels, recyclerView, getApplicationContext(), progressBar, true);
+                                        Utility.allItemsLoaded(imageModels, recyclerView, getApplicationContext(), progressBar, true, getSupportFragmentManager());
                                         Collections.shuffle(imageModels);
                                 }
 

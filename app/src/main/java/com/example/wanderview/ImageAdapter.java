@@ -5,10 +5,12 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -21,11 +23,13 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     List<ImageModel> imageModels;
     final Context context;
     boolean isClickable = true;
+    FragmentManager fragmentManager;
 
-    public ImageAdapter(Context context, List<ImageModel> imageModels, boolean isClickable){
+    public ImageAdapter(Context context, List<ImageModel> imageModels, boolean isClickable, FragmentManager fragmentManager){
         this.context = context;
         this.imageModels = imageModels;
         this.isClickable = isClickable;
+        this.fragmentManager = fragmentManager;
     }
 
     @NonNull
@@ -45,11 +49,13 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                 .load(item.getImageUrl())
                 .into(holder.imageView);
 
-        if (item.getTitle() != null){
-            holder.textView.setText(item.getTitle());
+        if (item.getTitle() != null && item.getTitle().isEmpty()) {
+            holder.textView.setVisibility(View.GONE);
         } else {
-            holder.textView.setVisibility(View.INVISIBLE);
+            holder.textView.setText(item.getTitle());
+            holder.textView.setVisibility(View.VISIBLE);
         }
+
         holder.textView2.setText(item.getAuthor());
 
         long seconds = Timestamp.now().getSeconds() - item.getTimestamp();
@@ -76,13 +82,21 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
         // todo shake jak sie kliknie juz nie do klikniecia imageview
 
+        holder.postOptions.setOnClickListener(v -> {
+            PostOptionsFragment postOptionsFragment = PostOptionsFragment.newBottomFragment(item.getKey());
+            postOptionsFragment.show(fragmentManager, "postOptions");
+        });
+
         if(isClickable){
             holder.userProfileImage.setOnClickListener(v -> {
+                holder.postOptions.setVisibility(View.INVISIBLE);
                 Intent intent = new Intent(context, UserProfileActivity.class);
                 intent.putExtra("Author", item.getUid());
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
             });
+        } else {
+            holder.postOptions.setVisibility(View.VISIBLE);
         }
     }
 
@@ -95,6 +109,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         final ImageView imageView;
         final TextView textView, textView2, imageDate;
         final ImageView userProfileImage;
+        ImageView postOptions;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.imageView);
@@ -102,6 +117,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             textView2 = itemView.findViewById(R.id.imageAuthor);
             userProfileImage = itemView.findViewById(R.id.userProfileImage);
             imageDate = itemView.findViewById(R.id.imageDate);
+            postOptions = itemView.findViewById(R.id.postOptions);
         }
     }
 }

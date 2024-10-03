@@ -140,13 +140,14 @@ public class UserProfileActivity extends AppCompatActivity {
                     String author = imageSnapshot.child("author").getValue(String.class);
                     String title = imageSnapshot.child("title").getValue(String.class);
                     Long timestamp = imageSnapshot.child("date").getValue(Long.class);
+                    String key = imageSnapshot.getKey();
 
                     infoDatabaseReference.child(author).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             username = snapshot.child("username").getValue(String.class);
-                            imageModels.add(new ImageModel(imageUrl, title, username, profilePictureUri, timestamp));
-                            Utility.allItemsLoaded(imageModels, recyclerView, getApplicationContext(), progressBar, false);
+                            imageModels.add(new ImageModel(imageUrl, title, username, profilePictureUri, key, timestamp));
+                            Utility.allItemsLoaded(imageModels, recyclerView, getApplicationContext(), progressBar, false, getSupportFragmentManager());
                         }
 
                         @Override

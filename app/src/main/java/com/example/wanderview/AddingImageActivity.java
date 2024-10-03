@@ -36,13 +36,13 @@ public class AddingImageActivity extends AppCompatActivity {
     ImageView imageView;
     MaterialButton uploadImage;
     StorageReference storageReference;
-    String fileName;
     FirebaseUser currentUser;
     String title;
     TextInputLayout imageTitleEdit;
     Uri photoUri;
     DatabaseReference databaseReference, infoDatabaseReference;
     String username;
+    String key;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +59,6 @@ public class AddingImageActivity extends AppCompatActivity {
                 registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri ->{
                     if (uri != null){
                         imageView.setImageURI(uri);
-                        fileName = getPhotoNameFromUri(uri);
                         photoUri = uri;
                         // TODO Compressor tutaj na zdjecie
                     }
@@ -82,7 +81,8 @@ public class AddingImageActivity extends AppCompatActivity {
             }
         });
 
-        databaseReference = Utility.getUsersPhotosCollectionReference().child(currentUser.getUid());
+        databaseReference = Utility.getUsersPhotosCollectionReference().child(currentUser.getUid()).push();
+        key = databaseReference.getKey();
 
         imageView = findViewById(R.id.imageView);
         uploadImage = findViewById(R.id.uploadImage);
@@ -97,50 +97,23 @@ public class AddingImageActivity extends AppCompatActivity {
             title = imageTitleEdit.getEditText().getText().toString();
 
             if (photoUri != null){
-                storageReference = storageReference.child(currentUser.getUid()).child(fileName);
+                storageReference = storageReference.child(currentUser.getUid()).child(key);
 
                 storageReference.putFile(photoUri)
                         .addOnSuccessListener(taskSnapshot -> {
                             storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
                                String imageUrl = uri.toString();
 
-                                // todo przemyslec dzialanie tego dodawania authora do bazy danych jak w kluczu
-                                // todo wyzej jest to samo,  a pozniej pobieranie tego znowu
-
-                                // todo dodawania daty do zdjec
                                Map<String, Object> imageMetadata = new HashMap<>() ;
                                imageMetadata.put("url", imageUrl);
                                imageMetadata.put("author", currentUser.getUid());
                                imageMetadata.put("title", title);
                                imageMetadata.put("date", Timestamp.now().getSeconds());
-                               databaseReference.push().setValue(imageMetadata).addOnSuccessListener(unused -> { });
+                               databaseReference.setValue(imageMetadata).addOnSuccessListener(unused -> { });
                             });
                             finish();
                         });
             }
         });
-    }
-
-    private String getPhotoNameFromUri(Uri uri) {
-        String photoName = null;
-        ContentResolver contentResolver = getContentResolver();
-
-        String[] projection = { MediaStore
-                .Images.Media.DISPLAY_NAME };
-
-        Cursor cursor = contentResolver.query(uri, projection, null, null, null);
-
-        if (cursor != null) {
-            try {
-                if (cursor.moveToFirst()) {
-                    int nameIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME);
-                    photoName = cursor.getString(nameIndex);
-                }
-            } finally {
-                cursor.close();
-            }
-        }
-
-        return photoName;
     }
 }

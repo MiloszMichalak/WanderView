@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
@@ -65,8 +66,8 @@ public class Utility {
         return simpleDateFormat.format(date);
     }
 
-    public static void allItemsLoaded(List<ImageModel> imageModels, RecyclerView recyclerView, Context context, ProgressBar progressBar, boolean isClickable) {
-        ImageAdapter adapter = new ImageAdapter(context, imageModels, isClickable);
+    public static void allItemsLoaded(List<ImageModel> imageModels, RecyclerView recyclerView, Context context, ProgressBar progressBar, boolean isClickable, FragmentManager fragmentManager) {
+        ImageAdapter adapter = new ImageAdapter(context, imageModels, isClickable, fragmentManager);
         recyclerView.setAdapter(adapter);
         recyclerView.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.INVISIBLE);
