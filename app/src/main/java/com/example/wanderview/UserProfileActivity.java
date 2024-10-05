@@ -152,6 +152,7 @@ public class UserProfileActivity extends AppCompatActivity {
                     String title = imageSnapshot.child("title").getValue(String.class);
                     Long timestamp = imageSnapshot.child("date").getValue(Long.class);
                     String key = imageSnapshot.getKey();
+                    boolean likedByCurrentUser = imageSnapshot.child("likes").child(currentUser.getUid()).exists();
 
                     infoDatabaseReference.child(author).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -166,7 +167,8 @@ public class UserProfileActivity extends AppCompatActivity {
                                     author,
                                     key,
                                     timestamp,
-                                    likes));
+                                    likes,
+                                    likedByCurrentUser));
                             Utility.allItemsLoaded(imageModels, recyclerView, getApplicationContext(), progressBar, false, getSupportFragmentManager());
                         }
 

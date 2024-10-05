@@ -16,10 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.Timestamp;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -29,7 +26,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     final Context context;
     boolean isClickable;
     FragmentManager fragmentManager;
-    boolean isLikeClicked = false;
+    boolean isLikeClicked;
     DatabaseReference databaseReference;
     String uid;
     int likeAmmount;
@@ -114,44 +111,37 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
         holder.likeAmmount.setText(String.valueOf(item.getLikes()));
 
-        databaseReference = Utility.getUsersPhotosCollectionReference().child(item.getUid()).child(item.getKey()).child("likes").child(uid);
+        // todo totalnie logika likow jak ma dzialac bo nie dziala
 
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Boolean likeUid = snapshot.getValue(Boolean.class) != null ? snapshot.getValue(Boolean.class) : false;
-                if (likeUid){
-                    isLikeClicked = true;
-                    holder.likeButton.setColorFilter(ContextCompat.getColor(context, R.color.red), PorterDuff.Mode.SRC_IN);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+        isLikeClicked = item.isUserLiked();
+        if (item.isUserLiked()){
+            holder.likeButton.setColorFilter(ContextCompat.getColor(context, R.color.red), PorterDuff.Mode.SRC_IN);
+        }
 
         holder.likeButton.setOnClickListener(v -> {
             databaseReference = Utility.getUsersPhotosCollectionReference().child(item.getUid()).child(item.getKey());
             likeAmmount = item.getLikes();
 
-            if (!isLikeClicked){
+            if (!item.isUserLiked()){
                 holder.likeButton.animate().scaleX(1.2f).scaleY(1.2f).setDuration(100).withEndAction(() ->
                         holder.likeButton.animate().scaleX(1f).scaleY(1f).setDuration(100).start());
 
                 holder.likeButton.setColorFilter(ContextCompat.getColor(context, R.color.red), PorterDuff.Mode.SRC_IN);
                 likeAmmount += 1;
                 databaseReference.child("likes").child(uid).setValue(true);
-                isLikeClicked = true;
+                item.isUserLiked = true;
             } else {
                 holder.likeButton.setColorFilter(null);
                 likeAmmount -= 1;
                 databaseReference.child("likes").child(uid).removeValue();
-                isLikeClicked = false;
+                item.isUserLiked = false;
             }
+
             databaseReference.child("likeAmmount").setValue(likeAmmount);
-            holder.likeAmmount.setText(String.valueOf(likeAmmount));
+            holder.likeAmmount.animate().translationY(-100f).setDuration(200).withEndAction(() -> {
+                holder.likeAmmount.setText(String.valueOf(likeAmmount));
+                holder.likeAmmount.animate().translationY(0).setDuration(300).start();
+            });
             item.setLikes(likeAmmount);
         });
 

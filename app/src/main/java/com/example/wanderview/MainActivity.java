@@ -128,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
                         String key = imageSnapshot.getKey();
 
                         if (!author.equals(currentUser.getUid())){
+                            boolean likedByCurrentUser = imageSnapshot.child("likes").child(currentUser.getUid()).exists();
                             infoDatabaseReference.child(author).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -141,10 +142,12 @@ public class MainActivity extends AppCompatActivity {
                                             author,
                                             key,
                                             date,
-                                            likes
+                                            likes,
+                                            likedByCurrentUser
                                     ));
                                         Utility.allItemsLoaded(imageModels, recyclerView, getApplicationContext(), progressBar, true, getSupportFragmentManager());
                                         Collections.shuffle(imageModels);
+
                                 }
 
                                 @Override

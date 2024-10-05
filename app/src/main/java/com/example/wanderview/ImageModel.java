@@ -9,8 +9,9 @@ public class ImageModel {
     private final String key;
     long timestamp;
     int likes;
+    boolean isUserLiked;
 
-    public ImageModel(String imageUrl, String title, String author, String userProfileImage, String uid, String key, long timestamp, int likes){
+    public ImageModel(String imageUrl, String title, String author, String userProfileImage, String uid, String key, long timestamp, int likes, boolean isUserLiked){
         this.imageUrl = imageUrl;
         this.title = title;
         this.author = author;
@@ -19,6 +20,7 @@ public class ImageModel {
         this.key = key;
         this.timestamp = timestamp;
         this.likes = likes;
+        this.isUserLiked = isUserLiked;
     }
 
     public String getImageUrl() {
@@ -40,6 +42,8 @@ public class ImageModel {
     public String getKey() { return key; }
 
     public int getLikes() { return likes; }
+
+    public boolean isUserLiked() { return isUserLiked; }
 
     public void setLikes(int likes) { this.likes = likes; }
 }
