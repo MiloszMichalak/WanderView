@@ -17,10 +17,10 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
-import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -30,7 +30,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class UserProfileActivity extends AppCompatActivity {
 
@@ -46,7 +45,7 @@ public class UserProfileActivity extends AppCompatActivity {
     String profilePictureUri;
     List<ImageModel> imageModels = new ArrayList<>();
     ImageButton userOption;
-
+    SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +61,7 @@ public class UserProfileActivity extends AppCompatActivity {
         currentUser = Utility.getCurrentUser();
 
         recyclerView = findViewById(R.id.imageList);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
+        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, true));
 
         Intent intent = getIntent();
         editProfileBtn = findViewById(R.id.editProfileBtn);
@@ -126,8 +125,20 @@ public class UserProfileActivity extends AppCompatActivity {
             });
         });
 
+        swipeRefreshLayout = findViewById(R.id.main);
+
+        swipeRefreshLayout.setProgressBackgroundColorSchemeResource(R.color.colorSecondary);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
+
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            fetchImagesFromStorage(databaseReference);
+            swipeRefreshLayout.setRefreshing(false);
+        });
+
         fetchImagesFromStorage(databaseReference);
     }
+
+    // todo dodac ze jak user usuwa posta to odswieza mu adapter
 
     public void fetchImagesFromStorage(DatabaseReference databaseReference){
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -146,7 +157,16 @@ public class UserProfileActivity extends AppCompatActivity {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             username = snapshot.child("username").getValue(String.class);
-                            imageModels.add(new ImageModel(imageUrl, title, username, profilePictureUri, key, timestamp));
+                            int likes = imageSnapshot.child("likeAmmount").getValue(Integer.class);
+
+                            imageModels.add(new ImageModel(imageUrl,
+                                    title,
+                                    username,
+                                    profilePictureUri,
+                                    author,
+                                    key,
+                                    timestamp,
+                                    likes));
                             Utility.allItemsLoaded(imageModels, recyclerView, getApplicationContext(), progressBar, false, getSupportFragmentManager());
                         }
 

@@ -85,7 +85,7 @@ public class EditProfileActivity extends AppCompatActivity {
             ImagePicker.with(this)
                     .cropSquare()
                     .compress(4096)
-                    .maxResultSize(200, 200)
+                    .maxResultSize(300, 300)
                     .start();
         });
 

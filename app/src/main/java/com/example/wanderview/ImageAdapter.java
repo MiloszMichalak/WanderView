@@ -2,19 +2,24 @@ package com.example.wanderview;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.Timestamp;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -22,8 +27,12 @@ import java.util.concurrent.TimeUnit;
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
     List<ImageModel> imageModels;
     final Context context;
-    boolean isClickable = true;
+    boolean isClickable;
     FragmentManager fragmentManager;
+    boolean isLikeClicked = false;
+    DatabaseReference databaseReference;
+    String uid;
+    int likeAmmount;
 
     public ImageAdapter(Context context, List<ImageModel> imageModels, boolean isClickable, FragmentManager fragmentManager){
         this.context = context;
@@ -45,18 +54,24 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
         ImageModel item = imageModels.get(position);
 
+        uid = Utility.getCurrentUser().getUid();
+
         Glide.with(context)
                 .load(item.getImageUrl())
                 .into(holder.imageView);
 
         if (item.getTitle() != null && item.getTitle().isEmpty()) {
-            holder.textView.setVisibility(View.GONE);
+            holder.imageTitle.setVisibility(View.GONE);
         } else {
-            holder.textView.setText(item.getTitle());
-            holder.textView.setVisibility(View.VISIBLE);
+            holder.imageTitle.setText(item.getTitle());
+            holder.imageTitle.setVisibility(View.VISIBLE);
         }
 
-        holder.textView2.setText(item.getAuthor());
+        if (uid.equals(item.getUid())){
+            holder.postOptions.setVisibility(View.VISIBLE);
+        }
+
+        holder.imageAuthor.setText(item.getAuthor());
 
         long seconds = Timestamp.now().getSeconds() - item.getTimestamp();
         long minutes = TimeUnit.SECONDS.toMinutes(seconds);
@@ -95,9 +110,51 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
             });
-        } else {
-            holder.postOptions.setVisibility(View.VISIBLE);
         }
+
+        holder.likeAmmount.setText(String.valueOf(item.getLikes()));
+
+        databaseReference = Utility.getUsersPhotosCollectionReference().child(item.getUid()).child(item.getKey()).child("likes").child(uid);
+
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Boolean likeUid = snapshot.getValue(Boolean.class) != null ? snapshot.getValue(Boolean.class) : false;
+                if (likeUid){
+                    isLikeClicked = true;
+                    holder.likeButton.setColorFilter(ContextCompat.getColor(context, R.color.red), PorterDuff.Mode.SRC_IN);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        holder.likeButton.setOnClickListener(v -> {
+            databaseReference = Utility.getUsersPhotosCollectionReference().child(item.getUid()).child(item.getKey());
+            likeAmmount = item.getLikes();
+
+            if (!isLikeClicked){
+                holder.likeButton.animate().scaleX(1.2f).scaleY(1.2f).setDuration(100).withEndAction(() ->
+                        holder.likeButton.animate().scaleX(1f).scaleY(1f).setDuration(100).start());
+
+                holder.likeButton.setColorFilter(ContextCompat.getColor(context, R.color.red), PorterDuff.Mode.SRC_IN);
+                likeAmmount += 1;
+                databaseReference.child("likes").child(uid).setValue(true);
+                isLikeClicked = true;
+            } else {
+                holder.likeButton.setColorFilter(null);
+                likeAmmount -= 1;
+                databaseReference.child("likes").child(uid).removeValue();
+                isLikeClicked = false;
+            }
+            databaseReference.child("likeAmmount").setValue(likeAmmount);
+            holder.likeAmmount.setText(String.valueOf(likeAmmount));
+            item.setLikes(likeAmmount);
+        });
+
     }
 
     @Override
@@ -107,17 +164,19 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         final ImageView imageView;
-        final TextView textView, textView2, imageDate;
-        final ImageView userProfileImage;
-        ImageView postOptions;
+        final TextView imageTitle, imageAuthor, imageDate, likeAmmount;
+        final ImageView userProfileImage, postOptions;
+        ImageView likeButton;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.imageView);
-            textView = itemView.findViewById(R.id.imageTitle);
-            textView2 = itemView.findViewById(R.id.imageAuthor);
+            imageTitle = itemView.findViewById(R.id.imageTitle);
+            imageAuthor = itemView.findViewById(R.id.imageAuthor);
             userProfileImage = itemView.findViewById(R.id.userProfileImage);
             imageDate = itemView.findViewById(R.id.imageDate);
             postOptions = itemView.findViewById(R.id.postOptions);
+            likeButton = itemView.findViewById(R.id.likeButton);
+            likeAmmount = itemView.findViewById(R.id.likeAmmount);
         }
     }
 }

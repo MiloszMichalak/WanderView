@@ -1,10 +1,7 @@
 package com.example.wanderview;
 
-import android.content.ContentResolver;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
@@ -109,6 +106,7 @@ public class AddingImageActivity extends AppCompatActivity {
                                imageMetadata.put("author", currentUser.getUid());
                                imageMetadata.put("title", title);
                                imageMetadata.put("date", Timestamp.now().getSeconds());
+                               imageMetadata.put("likeAmmount", 0);
                                databaseReference.setValue(imageMetadata).addOnSuccessListener(unused -> { });
                             });
                             finish();

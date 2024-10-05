@@ -19,7 +19,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -99,6 +98,9 @@ public class MainActivity extends AppCompatActivity {
 
         swipeRefreshLayout = findViewById(R.id.swipeRefresh);
 
+        swipeRefreshLayout.setProgressBackgroundColorSchemeResource(R.color.colorSecondary);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
+
         swipeRefreshLayout.setOnRefreshListener(() -> {
             progressBar.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.INVISIBLE);
@@ -129,6 +131,8 @@ public class MainActivity extends AppCompatActivity {
                             infoDatabaseReference.child(author).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    int likes = imageSnapshot.child("likeAmmount").getValue(Integer.class);
+
                                     imageModels.add(new ImageModel(
                                             imageUrl,
                                             title,
@@ -136,7 +140,8 @@ public class MainActivity extends AppCompatActivity {
                                             snapshot.child("photoUrl").getValue(String.class),
                                             author,
                                             key,
-                                            date
+                                            date,
+                                            likes
                                     ));
                                         Utility.allItemsLoaded(imageModels, recyclerView, getApplicationContext(), progressBar, true, getSupportFragmentManager());
                                         Collections.shuffle(imageModels);

@@ -5,20 +5,12 @@ public class ImageModel {
     private final String title;
     private final String author;
     private final String userProfileImage;
-    private String uid;
-    private String key;
+    private final String uid;
+    private final String key;
     long timestamp;
+    int likes;
 
-    public ImageModel(String imageUrl, String title, String author, String userProfileImage, String key,long timestamp){
-        this.imageUrl = imageUrl;
-        this.title = title;
-        this.author = author;
-        this.userProfileImage = userProfileImage;
-        this.key = key;
-        this.timestamp = timestamp;
-    }
-
-    public ImageModel(String imageUrl, String title, String author, String userProfileImage, String uid, String key, long timestamp){
+    public ImageModel(String imageUrl, String title, String author, String userProfileImage, String uid, String key, long timestamp, int likes){
         this.imageUrl = imageUrl;
         this.title = title;
         this.author = author;
@@ -26,6 +18,7 @@ public class ImageModel {
         this.uid = uid;
         this.key = key;
         this.timestamp = timestamp;
+        this.likes = likes;
     }
 
     public String getImageUrl() {
@@ -45,4 +38,8 @@ public class ImageModel {
     public long getTimestamp() { return timestamp; }
 
     public String getKey() { return key; }
+
+    public int getLikes() { return likes; }
+
+    public void setLikes(int likes) { this.likes = likes; }
 }
