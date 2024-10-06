@@ -3,7 +3,7 @@ package com.example.wanderview;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import androidx.activity.EdgeToEdge;
@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -34,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     FirebaseUser currentUser;
     FloatingActionButton addImageBtn;
     RecyclerView recyclerView;
-    ImageButton userProfileSettings;
+    ImageView userProfileSettings;
     ProgressBar progressBar;
     List<ImageModel> imageModels = new ArrayList<>();
     DatabaseReference databaseReference, infoDatabaseReference;
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
                 photoUrl = snapshot.child("photoUrl").getValue(String.class);
                 Glide.with(getApplicationContext())
                         .load(photoUrl)
+                        .apply(RequestOptions.circleCropTransform())
                         .error(R.drawable.profile_default)
                         .into(userProfileSettings);
             }
@@ -145,9 +147,9 @@ public class MainActivity extends AppCompatActivity {
                                             likes,
                                             likedByCurrentUser
                                     ));
-                                        Utility.allItemsLoaded(imageModels, recyclerView, getApplicationContext(), progressBar, true, getSupportFragmentManager());
-                                        Collections.shuffle(imageModels);
 
+                                    Utility.allImagesLoaded(imageModels, recyclerView, getApplicationContext(), progressBar, true, getSupportFragmentManager());
+                                    Collections.shuffle(imageModels);
                                 }
 
                                 @Override

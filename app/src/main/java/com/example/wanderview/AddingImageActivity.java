@@ -109,8 +109,8 @@ public class AddingImageActivity extends AppCompatActivity {
                                imageMetadata.put("likeAmmount", 0);
                                databaseReference.setValue(imageMetadata).addOnSuccessListener(unused -> { });
                             });
-                            finish();
                         });
+                finish();
             }
         });
     }

@@ -30,4 +30,7 @@
     <string name="taken_username">Nazwa użytkownika jest zajęta</string>
     <string name="time_in_hours">%1$dg</string>
     <string name="delete_post">Usuń post</string>
+    <string name="likes">Polubienia</string>
+    <string name="post_options">Opcje postu</string>
+    <string name="like">Polub</string>
 </resources>

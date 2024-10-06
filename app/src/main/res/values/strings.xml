@@ -34,5 +34,8 @@
     <string name="time_in_hours">%1$dh</string>
     <string name="time_in_days" translatable="false">%1$dd</string>
     <string name="delete_post">Delete post</string>
+    <string name="likes">Likes</string>
+    <string name="post_options">Post options</string>
+    <string name="like">Like</string>
 
 </resources>

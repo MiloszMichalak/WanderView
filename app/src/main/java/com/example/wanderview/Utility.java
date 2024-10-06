@@ -66,11 +66,16 @@ public class Utility {
         return simpleDateFormat.format(date);
     }
 
-    public static void allItemsLoaded(List<ImageModel> imageModels, RecyclerView recyclerView, Context context, ProgressBar progressBar, boolean isClickable, FragmentManager fragmentManager) {
+    public static void allImagesLoaded(List<ImageModel> imageModels, RecyclerView recyclerView, Context context, ProgressBar progressBar, boolean isClickable, FragmentManager fragmentManager) {
         ImageAdapter adapter = new ImageAdapter(context, imageModels, isClickable, fragmentManager);
         recyclerView.setAdapter(adapter);
         recyclerView.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.INVISIBLE);
+    }
+
+    public static void allUsersLoaded(List<UserModel> userModels, RecyclerView recyclerView, Context context) {
+        UserAdapter adapter = new UserAdapter(context, userModels);
+        recyclerView.setAdapter(adapter);
     }
 
     public static void disableButton(EditText usernameEdit, MaterialButton saveInfo){

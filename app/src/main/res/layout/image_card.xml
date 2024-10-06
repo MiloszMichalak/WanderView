@@ -2,107 +2,95 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_marginBottom="20dp">
 
     <ImageView
         android:id="@+id/userProfileImage"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:background="@drawable/round_border"
-        android:clipToOutline="true"
-        android:contentDescription="@string/user_picture"
-        android:layout_marginStart="10dp" />
+        android:layout_marginStart="10dp"
+        android:contentDescription="@string/user_picture" />
 
-    <!--    centrowanie tej daty i lpsze wyswietlanie-->
-    <LinearLayout
+    <TextView
+        android:id="@+id/imageAuthor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:id="@+id/userInfo"
-        android:layout_toEndOf="@+id/userProfileImage">
+        android:layout_marginStart="10dp"
+        android:layout_toEndOf="@id/userProfileImage"
+        android:textSize="25sp" />
 
-        <TextView
-            android:id="@+id/imageAuthor"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:textSize="20sp" />
-
-        <TextView
-            android:id="@+id/imageDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:textSize="20sp" />
-
-    </LinearLayout>
+    <TextView
+        android:id="@+id/imageDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_toEndOf="@id/imageAuthor"
+        android:layout_alignBaseline="@id/imageAuthor"
+        android:textSize="16sp"
+        android:alpha="0.7"/>
 
     <ImageView
         android:id="@+id/postOptions"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/three_dots"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
         android:layout_alignParentEnd="true"
+        android:layout_marginEnd="5dp"
+        android:src="@drawable/three_dots"
         android:visibility="invisible"
-        android:scaleY="0.7"
-        android:scaleX="0.7" />
+        android:contentDescription="@string/post_options"/>
 
     <TextView
         android:id="@+id/imageTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:textSize="25sp"
-        android:layout_below="@id/userInfo"
-        android:layout_toEndOf="@id/userProfileImage"
-        android:layout_marginStart="10dp" />
+        android:layout_below="@id/imageAuthor"
+        android:layout_alignStart="@id/imageAuthor"
+        android:textSize="20sp" />
 
     <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/round_border"
-        android:clipToOutline="true"
-        android:contentDescription="@string/landscape_image"
-        android:layout_below="@id/imageTitle"
-        android:layout_toEndOf="@id/userProfileImage"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginTop="10dp" />
-
-    <LinearLayout
+        android:id="@+id/likeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:id="@+id/postInfo"
-        android:layout_below="@id/imageView"
-        android:layout_toEndOf="@id/userProfileImage"
-        android:gravity="center_vertical"
-        android:layout_marginStart="5dp"
+        android:layout_below="@id/cardImage"
+        android:layout_alignStart="@id/cardImage"
         android:layout_marginTop="5dp"
-        android:padding="2dp">
+        android:backgroundTint="@color/colorPrimary"
+        android:padding="3dp"
+        android:src="@drawable/heart_icon"
+        android:contentDescription="@string/like"/>
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/heart_icon"
-            android:backgroundTint="@color/colorPrimary"
-            android:id="@+id/likeButton"
-            android:padding="5dp"/>
+    <TextView
+        android:id="@+id/likeAmmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/likeButton"
+        android:layout_toEndOf="@id/likeButton"
+        android:textSize="25sp" />
 
-        <TextView
-            android:id="@+id/likeAmmount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="24sp"/>
+   <androidx.cardview.widget.CardView
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:id="@+id/cardImage"
+       android:layout_below="@id/imageTitle"
+       android:layout_marginEnd="15dp"
+       android:layout_alignStart="@id/imageAuthor"
+       android:layout_marginTop="15dp"
+       app:cardCornerRadius="10dp">
 
-    </LinearLayout>
+       <ImageView
+           android:id="@+id/imageView"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:contentDescription="@string/landscape_image" />
+
+   </androidx.cardview.widget.CardView>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
-        android:background="@color/colorSecondary"
-        android:layout_below="@id/postInfo"
-        android:layout_marginTop="20dp"/>
+        android:layout_below="@id/likeAmmount"
+        android:layout_marginTop="20dp"
+        android:background="@color/colorSecondary" />
 
 </RelativeLayout>

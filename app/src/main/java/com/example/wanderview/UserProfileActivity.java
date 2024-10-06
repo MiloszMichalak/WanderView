@@ -12,6 +12,7 @@ import android.widget.TextView;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -41,11 +42,11 @@ public class UserProfileActivity extends AppCompatActivity {
     MaterialButton editProfileBtn;
     ProgressBar progressBar;
     String author;
-    String username;
     String profilePictureUri;
     List<ImageModel> imageModels = new ArrayList<>();
     ImageButton userOption;
     SwipeRefreshLayout swipeRefreshLayout;
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +59,12 @@ public class UserProfileActivity extends AppCompatActivity {
             return insets;
         });
 
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        toolbar.setNavigationOnClickListener(v -> finish());
+
         currentUser = Utility.getCurrentUser();
 
         recyclerView = findViewById(R.id.imageList);
@@ -68,7 +75,9 @@ public class UserProfileActivity extends AppCompatActivity {
 
         userOption = findViewById(R.id.userOption);
 
-        if (intent.getStringExtra("Author") != null){
+        author = intent.getStringExtra("Author");
+
+        if (author != null && !author.equals(currentUser.getUid())){
             author = intent.getStringExtra("Author");
             editProfileBtn.setVisibility(View.INVISIBLE);
             userOption.setVisibility(View.INVISIBLE);
@@ -92,6 +101,7 @@ public class UserProfileActivity extends AppCompatActivity {
                         .error(R.drawable.profile_default)
                         .into(profilePicture);
 
+                getSupportActionBar().setTitle(author);
                 usernameText.setText(author);
             }
 
@@ -125,7 +135,7 @@ public class UserProfileActivity extends AppCompatActivity {
             });
         });
 
-        swipeRefreshLayout = findViewById(R.id.main);
+        swipeRefreshLayout = findViewById(R.id.swipeRefresh);
 
         swipeRefreshLayout.setProgressBackgroundColorSchemeResource(R.color.colorSecondary);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
@@ -157,7 +167,7 @@ public class UserProfileActivity extends AppCompatActivity {
                     infoDatabaseReference.child(author).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            username = snapshot.child("username").getValue(String.class);
+                            String username = snapshot.child("username").getValue(String.class);
                             int likes = imageSnapshot.child("likeAmmount").getValue(Integer.class);
 
                             imageModels.add(new ImageModel(imageUrl,
@@ -169,7 +179,7 @@ public class UserProfileActivity extends AppCompatActivity {
                                     timestamp,
                                     likes,
                                     likedByCurrentUser));
-                            Utility.allItemsLoaded(imageModels, recyclerView, getApplicationContext(), progressBar, false, getSupportFragmentManager());
+                            Utility.allImagesLoaded(imageModels, recyclerView, getApplicationContext(), progressBar, false, getSupportFragmentManager());
                         }
 
                         @Override

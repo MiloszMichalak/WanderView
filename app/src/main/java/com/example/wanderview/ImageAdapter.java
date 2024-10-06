@@ -15,6 +15,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.Timestamp;
 import com.google.firebase.database.DatabaseReference;
 
@@ -89,6 +90,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
         Glide.with(context)
                 .load(item.getUserProfileImage())
+                .apply(RequestOptions.circleCropTransform())
                 .error(R.drawable.profile_default)
                 .into(holder.userProfileImage);
 
@@ -109,9 +111,13 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             });
         }
 
-        holder.likeAmmount.setText(String.valueOf(item.getLikes()));
+        likeAmmount = item.getLikes();
 
-        // todo totalnie logika likow jak ma dzialac bo nie dziala
+        if (likeAmmount > 0){
+            holder.likeAmmount.setText(String.valueOf(item.getLikes()));
+        } else {
+            holder.likeAmmount.setVisibility(View.INVISIBLE);
+        }
 
         isLikeClicked = item.isUserLiked();
         if (item.isUserLiked()){
@@ -123,11 +129,16 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             likeAmmount = item.getLikes();
 
             if (!item.isUserLiked()){
-                holder.likeButton.animate().scaleX(1.2f).scaleY(1.2f).setDuration(100).withEndAction(() ->
-                        holder.likeButton.animate().scaleX(1f).scaleY(1f).setDuration(100).start());
+                holder.likeButton.animate().scaleX(1.2f).scaleY(1.2f).setDuration(150).withEndAction(() ->
+                        holder.likeButton.animate().scaleX(1f).scaleY(1f).setDuration(150).start());
 
                 holder.likeButton.setColorFilter(ContextCompat.getColor(context, R.color.red), PorterDuff.Mode.SRC_IN);
                 likeAmmount += 1;
+
+                if (likeAmmount == 1) {
+                    holder.likeAmmount.setVisibility(View.VISIBLE);
+                }
+
                 databaseReference.child("likes").child(uid).setValue(true);
                 item.isUserLiked = true;
             } else {
@@ -138,11 +149,27 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             }
 
             databaseReference.child("likeAmmount").setValue(likeAmmount);
+
             holder.likeAmmount.animate().translationY(-100f).setDuration(200).withEndAction(() -> {
-                holder.likeAmmount.setText(String.valueOf(likeAmmount));
-                holder.likeAmmount.animate().translationY(0).setDuration(300).start();
+                if (likeAmmount > 0){
+                    holder.likeAmmount.setVisibility(View.VISIBLE);
+                    holder.likeAmmount.setText(String.valueOf(likeAmmount));
+                    holder.likeAmmount.animate().translationY(0).setDuration(300).start();
+                } else {
+                    holder.likeAmmount.setVisibility(View.INVISIBLE);
+                }
             });
+
+
             item.setLikes(likeAmmount);
+        });
+
+        holder.likeAmmount.setOnClickListener(v -> {
+            Intent intent = new Intent(context, UsersListActivity.class);
+            intent.putExtra("author", item.getUid());
+            intent.putExtra("postKey", item.getKey());
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
         });
 
     }
