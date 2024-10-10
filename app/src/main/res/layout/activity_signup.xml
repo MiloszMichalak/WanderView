@@ -1,121 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SignUpActivity"
-    android:orientation="vertical"
-    android:gravity="center_horizontal">
-
-    <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="260dp"
-        android:background="@drawable/mountain_bg">
-
-        <TextView
-            android:id="@+id/welcomeText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:gravity="center_horizontal"
-            android:text="@string/welcome_text"
-            android:textSize="26sp"
-            android:layout_gravity="center_horizontal"
-            android:textColor="@color/beige"/>
-
-    </FrameLayout>
-
-<LinearLayout
-    android:layout_width="300dp"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:showDividers="middle"
-    android:divider="@drawable/empty_divider"
-    android:layout_marginTop="50dp">
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/FilledBox"
-        android:id="@+id/editTextUsername"
-        app:startIconDrawable="@drawable/user_icon"
-        app:counterEnabled="true"
-        app:counterMaxLength="20">
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:autofillHints="username"
-            android:hint="@string/username"
-            android:inputType="text"
-            android:id="@+id/usernameEdit"/>
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/FilledBox"
-        android:id="@+id/editTextEmail"
-        app:startIconDrawable="@drawable/email_icon">
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:autofillHints="emailAddress"
-            android:hint="@string/email"
-            android:inputType="textEmailAddress"
-            android:id="@+id/emailEdit"/>
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        style="@style/FilledBox"
-        android:id="@+id/editTextPassword"
-        app:startIconDrawable="@drawable/padlock_icon"
-        app:endIconMode="password_toggle">
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:autofillHints="password"
-            android:hint="@string/password"
-            android:inputType="textPassword"
-            android:id="@+id/passwordEdit"/>
-    </com.google.android.material.textfield.TextInputLayout>
-
-</LinearLayout>
-
-    <com.google.android.material.button.MaterialButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/register"
-        android:layout_marginTop="30dp"
-        android:width="200dp"
-        android:id="@+id/registerButton"
-        style="@style/MaterialButton"/>
+    android:gravity="center_horizontal"
+    android:fillViewport="true">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:showDividers="middle"
-        android:divider="@drawable/empty_divider"
-        android:layout_marginTop="10dp">
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
 
-        <TextView
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="260dp"
+            android:background="@drawable/mountain_bg">
+
+            <TextView
+                android:id="@+id/welcomeText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:gravity="center_horizontal"
+                android:text="@string/welcome_text"
+                android:textSize="26sp"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/beige"/>
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:showDividers="middle"
+            android:divider="@drawable/empty_divider"
+            android:layout_marginTop="50dp">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/FilledBox"
+                android:id="@+id/editTextUsername"
+                app:startIconDrawable="@drawable/user_icon"
+                app:counterEnabled="true"
+                app:counterMaxLength="20">
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="username"
+                    android:hint="@string/username"
+                    android:inputType="text"
+                    android:id="@+id/usernameEdit"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/FilledBox"
+                android:id="@+id/editTextEmail"
+                app:startIconDrawable="@drawable/email_icon">
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="emailAddress"
+                    android:hint="@string/email"
+                    android:inputType="textEmailAddress"
+                    android:id="@+id/emailEdit"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                style="@style/FilledBox"
+                android:id="@+id/editTextPassword"
+                app:startIconDrawable="@drawable/padlock_icon"
+                app:endIconMode="password_toggle">
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="password"
+                    android:hint="@string/password"
+                    android:inputType="textPassword"
+                    android:id="@+id/passwordEdit"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/old_user" />
+            android:text="@string/register"
+            android:layout_marginTop="30dp"
+            android:width="200dp"
+            android:id="@+id/registerButton"
+            style="@style/MaterialButton"/>
 
-        <TextView
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/signika_semibold"
-            android:text="@string/login"
-            android:id="@+id/swapToLogin"/>
+            android:orientation="horizontal"
+            android:showDividers="middle"
+            android:divider="@drawable/empty_divider"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/old_user" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/signika_semibold"
+                android:text="@string/login"
+                android:id="@+id/swapToLogin"/>
+        </LinearLayout>
+
     </LinearLayout>
 
-</LinearLayout>
+</ScrollView>

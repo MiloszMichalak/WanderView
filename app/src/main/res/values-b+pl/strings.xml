@@ -21,7 +21,6 @@
     <string name="add_title">Dodaj tytuł</string>
     <string name="landscape_image">Zdjęcie krajobrazu</string>
     <string name="user_picture">Zdjęcie profilowe użytkownika</string>
-    <string name="your_photos">Twoje zdjęcia</string>
     <string name="edit_profile">Edytuj profil</string>
     <string name="not_blank_username">Nazwa nie może być pusta</string>
     <string name="save">Zapisz</string>
@@ -33,4 +32,9 @@
     <string name="likes">Polubienia</string>
     <string name="post_options">Opcje postu</string>
     <string name="like">Polub</string>
+    <string name="no_posts">Nie ma postow</string>
+    <string name="comments">Komentarze</string>
+    <string name="upload_comment">Napisz kometarz</string>
+    <string name="add_comment">Dodaj komentarz</string>
+
 </resources>

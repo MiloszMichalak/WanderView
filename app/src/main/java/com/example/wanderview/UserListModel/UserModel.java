@@ -1,4 +1,4 @@
-package com.example.wanderview;
+package com.example.wanderview.UserListModel;
 
 public class UserModel {
     private final String author;

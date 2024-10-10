@@ -8,12 +8,20 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.wanderview.CommentModel.CommentAdapter;
+import com.example.wanderview.CommentModel.CommentModel;
+import com.example.wanderview.PostModel.ImageAdapter;
+import com.example.wanderview.PostModel.ImageModel;
+import com.example.wanderview.UserListModel.UserAdapter;
+import com.example.wanderview.UserListModel.UserModel;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -25,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class Utility {
     public static boolean isValidEmail(CharSequence email){
@@ -66,16 +75,41 @@ public class Utility {
         return simpleDateFormat.format(date);
     }
 
-    public static void allImagesLoaded(List<ImageModel> imageModels, RecyclerView recyclerView, Context context, ProgressBar progressBar, boolean isClickable, FragmentManager fragmentManager) {
-        ImageAdapter adapter = new ImageAdapter(context, imageModels, isClickable, fragmentManager);
+    public static void allImagesLoaded(List<ImageModel> imageModels, RecyclerView recyclerView, Context context, ProgressBar progressBar, boolean isClickable,
+                                       FragmentManager fragmentManager){
+        ImageAdapter adapter = new ImageAdapter(context, imageModels, isClickable, fragmentManager, recyclerView);
         recyclerView.setAdapter(adapter);
         recyclerView.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.INVISIBLE);
     }
 
-    public static void allUsersLoaded(List<UserModel> userModels, RecyclerView recyclerView, Context context) {
-        UserAdapter adapter = new UserAdapter(context, userModels);
+    public static void allUsersLoaded(List<UserModel> array, RecyclerView recyclerView, Context context) {
+        UserAdapter adapter = new UserAdapter(context, array);
         recyclerView.setAdapter(adapter);
+    }
+
+    public static void allCommentsLoaded(List<CommentModel> array, RecyclerView recyclerView, Context context) {
+        CommentAdapter adapter = new CommentAdapter(array, context);
+        recyclerView.setAdapter(adapter);
+    }
+
+    public static void secondsToDate(long secondsTimestamp, Context context, TextView imageDate){
+        long seconds = Timestamp.now().getSeconds() - secondsTimestamp;
+        long minutes = TimeUnit.SECONDS.toMinutes(seconds);
+        long hours = TimeUnit.MINUTES.toHours(minutes);
+        long days = TimeUnit.HOURS.toDays(hours);
+
+        if (seconds < 60){
+            imageDate.setText(context.getString(R.string.time_in_seconds, seconds));
+        } else if (minutes < 60) {
+            imageDate.setText(context.getString(R.string.time_in_minutes, minutes));
+        } else if (hours < 24){
+            imageDate.setText(context.getString(R.string.time_in_hours, hours));
+        } else if (days < 7){
+            imageDate.setText(context.getString(R.string.time_in_days, days));
+        } else {
+            imageDate.setText(Utility.timestampToDate(seconds, "dd:MM"));
+        }
     }
 
     public static void disableButton(EditText usernameEdit, MaterialButton saveInfo){
@@ -116,5 +150,13 @@ public class Utility {
             @Override
             public void afterTextChanged(Editable s) { }
         });
+    }
+
+    public static void hideLikesIf0Comments(long likesCount, TextView likeAmount) {
+        if (likesCount > 0){
+            likeAmount.setText(String.valueOf(likesCount));
+        } else {
+            likeAmount.setVisibility(View.INVISIBLE);
+        }
     }
 }

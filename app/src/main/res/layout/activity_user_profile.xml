@@ -36,27 +36,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <androidx.cardview.widget.CardView
+                <ImageView
+                    android:id="@+id/imageView"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
-                    android:layout_marginTop="20dp"
-                    android:id="@+id/imageCard"
                     android:layout_centerHorizontal="true"
-                    app:cardCornerRadius="20dp">
-
-                    <ImageView
-                        android:id="@+id/imageView"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:contentDescription="@string/user_picture" />
-
-                </androidx.cardview.widget.CardView>
+                    android:contentDescription="@string/user_picture" />
 
                 <TextView
                     android:id="@+id/userName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/imageCard"
+                    android:layout_below="@id/imageView"
                     android:layout_marginTop="10dp"
                     android:gravity="center_horizontal"
                     android:textSize="25sp" />
@@ -69,6 +60,17 @@
                     android:layout_below="@id/userName"
                     android:layout_centerHorizontal="true"
                     android:text="@string/edit_profile" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/noPosts"
+                    android:text="@string/no_posts"
+                    android:layout_below="@id/editProfileBtn"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="40dp"
+                    android:textSize="40sp"
+                    android:visibility="invisible"/>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/imageList"

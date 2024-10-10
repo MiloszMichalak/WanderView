@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
     android:layout_marginBottom="20dp">
 
     <ImageView
@@ -52,8 +52,8 @@
         android:id="@+id/likeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/cardImage"
-        android:layout_alignStart="@id/cardImage"
+        android:layout_below="@id/imageView"
+        android:layout_alignStart="@id/imageView"
         android:layout_marginTop="5dp"
         android:backgroundTint="@color/colorPrimary"
         android:padding="3dp"
@@ -62,29 +62,42 @@
 
     <TextView
         android:id="@+id/likeAmmount"
-        android:layout_width="wrap_content"
+        android:layout_width="20dp"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@id/likeButton"
         android:layout_toEndOf="@id/likeButton"
-        android:textSize="25sp" />
+        android:textSize="25sp"
+        android:layout_marginStart="5dp"/>
 
-   <androidx.cardview.widget.CardView
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:id="@+id/cardImage"
-       android:layout_below="@id/imageTitle"
-       android:layout_marginEnd="15dp"
-       android:layout_alignStart="@id/imageAuthor"
-       android:layout_marginTop="15dp"
-       app:cardCornerRadius="10dp">
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/comment_icon"
+        android:layout_toEndOf="@id/likeAmmount"
+        android:layout_alignTop="@id/likeAmmount"
+        android:id="@+id/commentButton"
+        android:layout_marginStart="20dp"
+        android:contentDescription="@string/add_comment"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/commentAmount"
+        android:textSize="25sp"
+        android:layout_marginStart="5dp"
+        android:layout_toEndOf="@+id/commentButton"
+        android:layout_alignTop="@+id/commentButton"/>
 
        <ImageView
            android:id="@+id/imageView"
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
-           android:contentDescription="@string/landscape_image" />
-
-   </androidx.cardview.widget.CardView>
+           android:contentDescription="@string/landscape_image"
+           android:adjustViewBounds="true"
+           android:layout_below="@id/imageTitle"
+           android:layout_marginEnd="15dp"
+           android:layout_alignStart="@id/imageAuthor"
+           android:layout_marginTop="15dp"/>
 
     <View
         android:layout_width="match_parent"

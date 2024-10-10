@@ -21,6 +21,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
+import com.example.wanderview.PostModel.ImageModel;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -36,7 +39,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
     ImageView profilePicture;
     FirebaseUser currentUser;
-    TextView usernameText;
+    TextView usernameText, noPosts;
     DatabaseReference databaseReference, infoDatabaseReference;
     RecyclerView recyclerView;
     MaterialButton editProfileBtn;
@@ -99,6 +102,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 Glide.with(getApplicationContext())
                         .load(profilePictureUri)
                         .error(R.drawable.profile_default)
+                        .apply(RequestOptions.bitmapTransform(new RoundedCorners(20)))
                         .into(profilePicture);
 
                 getSupportActionBar().setTitle(author);
@@ -145,6 +149,8 @@ public class UserProfileActivity extends AppCompatActivity {
             swipeRefreshLayout.setRefreshing(false);
         });
 
+        noPosts = findViewById(R.id.noPosts);
+
         fetchImagesFromStorage(databaseReference);
     }
 
@@ -154,6 +160,12 @@ public class UserProfileActivity extends AppCompatActivity {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                long posts = dataSnapshot.getChildrenCount();
+                if (posts == 0){
+                    noPosts.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.INVISIBLE);
+                    return;
+                }
                 imageModels.clear();
 
                 for (DataSnapshot imageSnapshot : dataSnapshot.getChildren()){
@@ -163,12 +175,13 @@ public class UserProfileActivity extends AppCompatActivity {
                     Long timestamp = imageSnapshot.child("date").getValue(Long.class);
                     String key = imageSnapshot.getKey();
                     boolean likedByCurrentUser = imageSnapshot.child("likes").child(currentUser.getUid()).exists();
+                    Long commentsAmount = imageSnapshot.child("comments").getChildrenCount();
 
                     infoDatabaseReference.child(author).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             String username = snapshot.child("username").getValue(String.class);
-                            int likes = imageSnapshot.child("likeAmmount").getValue(Integer.class);
+                            long likes = imageSnapshot.child("likes").getChildrenCount();
 
                             imageModels.add(new ImageModel(imageUrl,
                                     title,
@@ -178,7 +191,8 @@ public class UserProfileActivity extends AppCompatActivity {
                                     key,
                                     timestamp,
                                     likes,
-                                    likedByCurrentUser));
+                                    likedByCurrentUser,
+                                    commentsAmount));
                             Utility.allImagesLoaded(imageModels, recyclerView, getApplicationContext(), progressBar, false, getSupportFragmentManager());
                         }
 

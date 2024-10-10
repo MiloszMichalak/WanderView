@@ -22,7 +22,6 @@
     <string name="add_title">Add title</string>
     <string name="landscape_image">landscape image</string>
     <string name="user_picture">User profile picture</string>
-    <string name="your_photos">Your photos</string>
     <string name="edit_profile">Edit profile</string>
     <string name="not_blank_username">Username cannot be blank</string>
     <string name="save">Save</string>
@@ -37,5 +36,9 @@
     <string name="likes">Likes</string>
     <string name="post_options">Post options</string>
     <string name="like">Like</string>
+    <string name="no_posts">No posts</string>
+    <string name="comments">Comments</string>
+    <string name="upload_comment">Upload comment</string>
+    <string name="add_comment">Add comment</string>
 
 </resources>

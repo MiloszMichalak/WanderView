@@ -1,4 +1,4 @@
-package com.example.wanderview;
+package com.example.wanderview.PostModel;
 
 public class ImageModel {
     private final String imageUrl;
@@ -8,10 +8,12 @@ public class ImageModel {
     private final String uid;
     private final String key;
     long timestamp;
-    int likes;
+    long likes;
     boolean isUserLiked;
+    long commentAmount;
 
-    public ImageModel(String imageUrl, String title, String author, String userProfileImage, String uid, String key, long timestamp, int likes, boolean isUserLiked){
+    public ImageModel(String imageUrl, String title, String author, String userProfileImage, String uid, String key,
+                      long timestamp, long likes, boolean isUserLiked, long commentAmount){
         this.imageUrl = imageUrl;
         this.title = title;
         this.author = author;
@@ -21,6 +23,7 @@ public class ImageModel {
         this.timestamp = timestamp;
         this.likes = likes;
         this.isUserLiked = isUserLiked;
+        this.commentAmount = commentAmount;
     }
 
     public String getImageUrl() {
@@ -41,9 +44,9 @@ public class ImageModel {
 
     public String getKey() { return key; }
 
-    public int getLikes() { return likes; }
+    public long getLikes() { return likes; }
 
-    public boolean isUserLiked() { return isUserLiked; }
+    public long getCommentAmount() { return commentAmount; }
 
-    public void setLikes(int likes) { this.likes = likes; }
+    public void setLikes(long likes) { this.likes = likes; }
 }

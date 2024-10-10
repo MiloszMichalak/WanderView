@@ -92,7 +92,7 @@ public class SignUpActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()){
-                        if (snapshot.child("username").getValue(String.class).toLowerCase().equals(username.toLowerCase())){
+                        if (snapshot.child("username").getValue(String.class).equalsIgnoreCase(username.toLowerCase())){
                             isValidData = false;
                             usernameEditText.setError(getString(R.string.taken_username));
                             break;

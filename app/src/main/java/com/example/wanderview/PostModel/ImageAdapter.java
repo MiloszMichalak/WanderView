@@ -1,4 +1,4 @@
-package com.example.wanderview;
+package com.example.wanderview.PostModel;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,28 +15,34 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
-import com.google.firebase.Timestamp;
+import com.example.wanderview.CommentModel.CommentFragment;
+import com.example.wanderview.R;
+import com.example.wanderview.UserListModel.UsersListActivity;
+import com.example.wanderview.UserProfileActivity;
+import com.example.wanderview.Utility;
 import com.google.firebase.database.DatabaseReference;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
     List<ImageModel> imageModels;
     final Context context;
     boolean isClickable;
     FragmentManager fragmentManager;
-    boolean isLikeClicked;
     DatabaseReference databaseReference;
     String uid;
-    int likeAmmount;
+    long likeAmmount;
+    View.OnClickListener listener;
+    RecyclerView recyclerView;
 
-    public ImageAdapter(Context context, List<ImageModel> imageModels, boolean isClickable, FragmentManager fragmentManager){
+    public ImageAdapter(Context context, List<ImageModel> imageModels, boolean isClickable, FragmentManager fragmentManager, RecyclerView recyclerView){
         this.context = context;
         this.imageModels = imageModels;
         this.isClickable = isClickable;
         this.fragmentManager = fragmentManager;
+        this.recyclerView = recyclerView;
     }
 
     @NonNull
@@ -56,6 +62,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
         Glide.with(context)
                 .load(item.getImageUrl())
+                .fitCenter()
+                .apply(RequestOptions.bitmapTransform(new RoundedCorners(30)))
                 .into(holder.imageView);
 
         if (item.getTitle() != null && item.getTitle().isEmpty()) {
@@ -71,22 +79,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
         holder.imageAuthor.setText(item.getAuthor());
 
-        long seconds = Timestamp.now().getSeconds() - item.getTimestamp();
-        long minutes = TimeUnit.SECONDS.toMinutes(seconds);
-        long hours = TimeUnit.MINUTES.toHours(minutes);
-        long days = TimeUnit.HOURS.toDays(hours);
-
-        if (seconds < 60){
-            holder.imageDate.setText(context.getString(R.string.time_in_seconds, seconds));
-        } else if (minutes < 60) {
-            holder.imageDate.setText(context.getString(R.string.time_in_minutes, minutes));
-        } else if (hours < 24){
-            holder.imageDate.setText(context.getString(R.string.time_in_hours, hours));
-        } else if (days < 7){
-            holder.imageDate.setText(context.getString(R.string.time_in_days, days));
-        } else {
-            holder.imageDate.setText(Utility.timestampToDate(seconds, "dd:MM"));
-        }
+        Utility.secondsToDate(item.getTimestamp(), context, holder.imageDate);
 
         Glide.with(context)
                 .load(item.getUserProfileImage())
@@ -94,61 +87,62 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                 .error(R.drawable.profile_default)
                 .into(holder.userProfileImage);
 
-        // todo shake jak sie kliknie juz nie do klikniecia imageview
 
         holder.postOptions.setOnClickListener(v -> {
             PostOptionsFragment postOptionsFragment = PostOptionsFragment.newBottomFragment(item.getKey());
             postOptionsFragment.show(fragmentManager, "postOptions");
         });
 
+        
+
         if(isClickable){
-            holder.userProfileImage.setOnClickListener(v -> {
+            listener = v -> {
                 holder.postOptions.setVisibility(View.INVISIBLE);
                 Intent intent = new Intent(context, UserProfileActivity.class);
                 intent.putExtra("Author", item.getUid());
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
-            });
+            };
+        } else {
+            listener = v -> {
+                recyclerView.animate().translationX(-10).setDuration(100).withEndAction(() -> {
+                    recyclerView.animate().translationX(10).setDuration(100).start();
+                });
+            };
         }
+        holder.userProfileImage.setOnClickListener(listener);
+        holder.imageAuthor.setOnClickListener(listener);
 
         likeAmmount = item.getLikes();
 
-        if (likeAmmount > 0){
-            holder.likeAmmount.setText(String.valueOf(item.getLikes()));
-        } else {
-            holder.likeAmmount.setVisibility(View.INVISIBLE);
-        }
+        Utility.hideLikesIf0Comments(likeAmmount, holder.likeAmmount);
 
-        isLikeClicked = item.isUserLiked();
-        if (item.isUserLiked()){
+        if (item.isUserLiked){
             holder.likeButton.setColorFilter(ContextCompat.getColor(context, R.color.red), PorterDuff.Mode.SRC_IN);
         }
 
-        holder.likeButton.setOnClickListener(v -> {
-            databaseReference = Utility.getUsersPhotosCollectionReference().child(item.getUid()).child(item.getKey());
-            likeAmmount = item.getLikes();
+        databaseReference = Utility.getUsersPhotosCollectionReference();
 
-            if (!item.isUserLiked()){
-                holder.likeButton.animate().scaleX(1.2f).scaleY(1.2f).setDuration(150).withEndAction(() ->
-                        holder.likeButton.animate().scaleX(1f).scaleY(1f).setDuration(150).start());
+            holder.likeButton.setOnClickListener(v -> {
+                likeAmmount = item.getLikes();
+                databaseReference = databaseReference.child(item.getUid()).child(item.getKey());
 
-                holder.likeButton.setColorFilter(ContextCompat.getColor(context, R.color.red), PorterDuff.Mode.SRC_IN);
-                likeAmmount += 1;
+                    if (!item.isUserLiked){
+                    holder.likeButton.animate().scaleX(1.2f).scaleY(1.2f).setDuration(150).withEndAction(() ->
+                            holder.likeButton.animate().scaleX(1f).scaleY(1f).setDuration(150).start());
 
-                if (likeAmmount == 1) {
-                    holder.likeAmmount.setVisibility(View.VISIBLE);
+                    holder.likeButton.setColorFilter(ContextCompat.getColor(context, R.color.red), PorterDuff.Mode.SRC_IN);
+                    likeAmmount += 1;
+
+                    databaseReference.child("likes").child(uid).setValue(true);
+                    item.isUserLiked = true;
                 }
-
-                databaseReference.child("likes").child(uid).setValue(true);
-                item.isUserLiked = true;
-            } else {
-                holder.likeButton.setColorFilter(null);
-                likeAmmount -= 1;
-                databaseReference.child("likes").child(uid).removeValue();
-                item.isUserLiked = false;
-            }
-
-            databaseReference.child("likeAmmount").setValue(likeAmmount);
+                else {
+                    holder.likeButton.setColorFilter(null);
+                    likeAmmount -= 1;
+                    databaseReference.child("likes").child(uid).removeValue();
+                    item.isUserLiked = false;
+                }
 
             holder.likeAmmount.animate().translationY(-100f).setDuration(200).withEndAction(() -> {
                 if (likeAmmount > 0){
@@ -159,8 +153,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                     holder.likeAmmount.setVisibility(View.INVISIBLE);
                 }
             });
-
-
             item.setLikes(likeAmmount);
         });
 
@@ -172,6 +164,13 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             context.startActivity(intent);
         });
 
+        // todo ilosc komentarzy
+        holder.commentAmount.setText(String.valueOf(item.getCommentAmount()));
+
+        holder.commentButton.setOnClickListener(v -> {
+            CommentFragment commentFragment = CommentFragment.newCommentFragment(item.getKey(), item.getUid());
+            commentFragment.show(fragmentManager, "comments");
+        });
     }
 
     @Override
@@ -181,8 +180,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         final ImageView imageView;
-        final TextView imageTitle, imageAuthor, imageDate, likeAmmount;
-        final ImageView userProfileImage, postOptions;
+        final TextView imageTitle, imageAuthor, imageDate, likeAmmount, commentAmount;
+        final ImageView userProfileImage, postOptions, commentButton;
         ImageView likeButton;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -194,6 +193,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             postOptions = itemView.findViewById(R.id.postOptions);
             likeButton = itemView.findViewById(R.id.likeButton);
             likeAmmount = itemView.findViewById(R.id.likeAmmount);
+            commentButton = itemView.findViewById(R.id.commentButton);
+            commentAmount = itemView.findViewById(R.id.commentAmount);
         }
     }
 }

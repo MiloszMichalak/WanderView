@@ -2,7 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="20dp">
+    android:id="@+id/main"
+    android:padding="10dp"
+    android:background="?attr/selectableItemBackground">
 
     <ImageView
         android:layout_width="48dp"
@@ -16,7 +18,6 @@
         android:id="@+id/imageAuthor"
         android:textSize="25sp"
         android:layout_marginStart="5dp"
-        android:layout_toEndOf="@id/userProfileImage"
-        />
+        android:layout_toEndOf="@id/userProfileImage" />
 
 </RelativeLayout>

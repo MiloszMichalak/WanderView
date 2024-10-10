@@ -9,7 +9,6 @@ import android.widget.ProgressBar;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -19,6 +18,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.wanderview.PostModel.ImageModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -123,9 +123,9 @@ public class MainActivity extends AppCompatActivity {
                 for (DataSnapshot userSnapshot : dataSnapshot.getChildren()){
 
                     for (DataSnapshot imageSnapshot : userSnapshot.getChildren()){
+                        String author = imageSnapshot.child("author").getValue(String.class);
                         String imageUrl = imageSnapshot.child("url").getValue(String.class);
                         String title = imageSnapshot.child("title").getValue(String.class);
-                        String author = imageSnapshot.child("author").getValue(String.class);
                         Long date = imageSnapshot.child("date").getValue(Long.class);
                         String key = imageSnapshot.getKey();
 
@@ -134,7 +134,8 @@ public class MainActivity extends AppCompatActivity {
                             infoDatabaseReference.child(author).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    int likes = imageSnapshot.child("likeAmmount").getValue(Integer.class);
+                                    long likes = imageSnapshot.child("likes").getChildrenCount();
+                                    long commentsAmount = imageSnapshot.child("comments").getChildrenCount();
 
                                     imageModels.add(new ImageModel(
                                             imageUrl,
@@ -145,7 +146,8 @@ public class MainActivity extends AppCompatActivity {
                                             key,
                                             date,
                                             likes,
-                                            likedByCurrentUser
+                                            likedByCurrentUser,
+                                            commentsAmount
                                     ));
 
                                     Utility.allImagesLoaded(imageModels, recyclerView, getApplicationContext(), progressBar, true, getSupportFragmentManager());
