@@ -44,3 +44,6 @@ desktop.ini
 *.db-journal
 *.db-shm
 *.db-wal
+gradle.properties
+gradlew
+gradlew.bat
