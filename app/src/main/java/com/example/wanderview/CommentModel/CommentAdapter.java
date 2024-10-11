@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -61,7 +63,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
 
         View.OnClickListener listener = v -> {
             Intent intent = new Intent(context, UserProfileActivity.class);
-            intent.putExtra("author", item.getAuthor());
+            intent.putExtra("Author", item.getUid());
             context.startActivity(intent);
         };
         holder.userProfileImage.setOnClickListener(listener);
@@ -75,11 +77,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
             holder.likeButton.setColorFilter(ContextCompat.getColor(context, R.color.red), PorterDuff.Mode.SRC_IN);
         }
 
-        databaseReference = Utility.getUsersPhotosCollectionReference();
-
         holder.likeButton.setOnClickListener(v -> {
             likeAmount = item.getLikes();
-            databaseReference = databaseReference.child(item.getUid()).child(item.getPostId())
+            databaseReference = Utility.getUsersPhotosCollectionReference().child(item.getAuthorPostId()).child(item.getPostId())
                     .child("comments").child(item.getKey());
 
             if (!item.isUserLiked()){
@@ -109,8 +109,29 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
             item.setLikes(likeAmount);
         });
 
-        // todo na przytrzymanie usun
+        holder.main.setOnLongClickListener(v -> {
+            if (uid.equals(item.getUid())) {
+                PopupMenu popupMenu = new PopupMenu(context, v);
+                popupMenu.getMenuInflater().inflate(R.menu.comment_popup_menu, popupMenu.getMenu());
 
+                popupMenu.show();
+
+                popupMenu.setOnMenuItemClickListener(item1 -> {
+                    if (item1.getItemId() == R.id.deleteComment) {
+
+                        databaseReference = Utility.getUsersPhotosCollectionReference().child(item.getAuthorPostId())
+                                .child(item.getPostId()).child("comments").child(item.getKey());
+
+                        databaseReference.removeValue();
+                        commentList.remove(position);
+                        notifyItemRemoved(position);
+                    }
+
+                    return false;
+                });
+            }
+            return true;
+        });
     }
 
     @Override
@@ -122,6 +143,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         RecyclerView recyclerView;
         TextView commentContent, commentAuthor, commentDate, likeAmount;
         ImageView userProfileImage, likeButton;
+        RelativeLayout main;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             recyclerView = itemView.findViewById(R.id.recyclerView);
@@ -131,6 +153,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
             commentDate = itemView.findViewById(R.id.commentDate);
             likeButton = itemView.findViewById(R.id.likeButton);
             likeAmount = itemView.findViewById(R.id.likeAmount);
+            main = itemView.findViewById(R.id.main);
         }
     }
 }

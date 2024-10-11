@@ -12,7 +12,7 @@
     <string name="welcome_back_text">Welcome back in WanderView world</string>
     <string name="invalid_username">Username must have between 3 and 20 chars</string>
     <string name="invalid_email">Invalid email</string>
-    <string name="invalid_password">Password must have minimum 8 characters</string>
+    <string name="invalid_password">Invalid password</string>
     <string name="invalid_data">Invalid email or password</string>
     <string name="email_send">Sent verification email</string>
     <string name="must_verify">You must verify email</string>
@@ -39,6 +39,8 @@
     <string name="no_posts">No posts</string>
     <string name="comments">Comments</string>
     <string name="upload_comment">Upload comment</string>
-    <string name="add_comment">Add comment</string>
+    <string name="add_comment">Add comment for</string>
+    <string name="delete_comment">Delete comment</string>
+    <string name="to_short_password">Password must have minimum 8 characters</string>
 
 </resources>

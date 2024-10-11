@@ -1,5 +1,6 @@
 package com.example.wanderview;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -72,6 +73,8 @@ public class AddingImageActivity extends AppCompatActivity {
                 setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
                 .build()));
 
+        Intent intent = new Intent();
+
         uploadImage.setOnClickListener(v -> {
             title = imageTitleEdit.getEditText().getText().toString();
 
@@ -92,6 +95,10 @@ public class AddingImageActivity extends AppCompatActivity {
                             });
                         });
             }
+            setResult(RESULT_OK, intent);
+            intent.putExtra("photoUrl", photoUri.toString());
+            intent.putExtra("title", title);
+            intent.putExtra("key", key);
             finish();
         });
     }

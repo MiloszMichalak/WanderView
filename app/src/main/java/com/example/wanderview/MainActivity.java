@@ -7,11 +7,14 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -20,6 +23,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.wanderview.PostModel.ImageModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -42,6 +46,40 @@ public class MainActivity extends AppCompatActivity {
     String username;
     String photoUrl;
     SwipeRefreshLayout swipeRefreshLayout;
+    LifecycleOwner lifecycleOwner;
+
+    private ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), o -> {
+        if (o.getResultCode() == RESULT_OK){
+            Intent data = o.getData();
+            if (data != null){
+                // todo dalej pobiera dane
+                infoDatabaseReference.child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        imageModels.add(0, new ImageModel(
+                                data.getStringExtra("photoUrl"),
+                                data.getStringExtra("title"),
+                                snapshot.child("username").getValue(String.class),
+                                photoUrl,
+                                currentUser.getUid(),
+                                data.getStringExtra("key"),
+                                Timestamp.now().getSeconds(),
+                                0,
+                                false,
+                                0
+                        ));
+                        recyclerView.getAdapter().notifyItemInserted(0);
+                        recyclerView.smoothScrollToPosition(0);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+        }
+    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        lifecycleOwner = this;
 
         currentUser = Utility.getCurrentUser();
 
@@ -81,7 +121,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        addImageBtn.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), AddingImageActivity.class)));
+        addImageBtn.setOnClickListener(v -> {
+            resultLauncher.launch(new Intent(this, AddingImageActivity.class));
+        });
 
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
@@ -109,6 +151,8 @@ public class MainActivity extends AppCompatActivity {
             fetchImagesFromStorage(databaseReference);
             swipeRefreshLayout.setRefreshing(false);
         });
+
+        // todo wyswietlenie swiezo dodanego posta do tego adaptera na samej gorze
 
         fetchImagesFromStorage(databaseReference);
     }
@@ -150,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
                                             commentsAmount
                                     ));
 
-                                    Utility.allImagesLoaded(imageModels, recyclerView, getApplicationContext(), progressBar, true, getSupportFragmentManager());
+                                    Utility.allImagesLoaded(imageModels, recyclerView, getApplicationContext(), progressBar, true, getSupportFragmentManager(), lifecycleOwner);
                                     Collections.shuffle(imageModels);
                                 }
 
