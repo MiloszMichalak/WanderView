@@ -93,8 +93,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             postOptionsFragment.show(fragmentManager, "postOptions");
         });
 
-        
-
         if(isClickable){
             listener = v -> {
                 holder.postOptions.setVisibility(View.INVISIBLE);
@@ -121,11 +119,9 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             holder.likeButton.setColorFilter(ContextCompat.getColor(context, R.color.red), PorterDuff.Mode.SRC_IN);
         }
 
-        databaseReference = Utility.getUsersPhotosCollectionReference();
-
             holder.likeButton.setOnClickListener(v -> {
                 likeAmmount = item.getLikes();
-                databaseReference = databaseReference.child(item.getUid()).child(item.getKey());
+                databaseReference = Utility.getUsersPhotosCollectionReference().child(item.getUid()).child(item.getKey());
 
                     if (!item.isUserLiked){
                     holder.likeButton.animate().scaleX(1.2f).scaleY(1.2f).setDuration(150).withEndAction(() ->

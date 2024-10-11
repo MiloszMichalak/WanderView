@@ -1,6 +1,7 @@
 package com.example.wanderview;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -158,5 +159,13 @@ public class Utility {
         } else {
             likeAmount.setVisibility(View.INVISIBLE);
         }
+    }
+
+    public static View.OnClickListener listenerForCommentUser(Context context, String uid){
+        return v -> {
+            Intent intent = new Intent(context, UserProfileActivity.class);
+            intent.putExtra("Author", uid);
+            context.startActivity(intent);
+        };
     }
 }

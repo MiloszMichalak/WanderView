@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.wanderview.R;
 import com.example.wanderview.Utility;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -36,6 +37,7 @@ public class CommentFragment extends BottomSheetDialogFragment {
     ImageView addCommentBtn;
     FirebaseUser currentUser;
     TextInputLayout commentContent;
+    ImageView imageView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -54,6 +56,24 @@ public class CommentFragment extends BottomSheetDialogFragment {
 
         databaseReference = Utility.getUsersPhotosCollectionReference().child(userId).child(postId).child("comments");
         infoDatabaseReference = Utility.getUsersInfoCollectionReference();
+
+        imageView = view.findViewById(R.id.userProfileImage);
+
+        infoDatabaseReference.child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Glide.with(view.getContext())
+                        .load(snapshot.child("photoUrl").getValue(String.class))
+                        .circleCrop()
+                        .into(imageView);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
 
         addCommentBtn = view.findViewById(R.id.addCommentBtn);
 
@@ -97,9 +117,10 @@ public class CommentFragment extends BottomSheetDialogFragment {
                                     commentContent,
                                     likes,
                                     isUserLiked,
-                                    userId,
+                                    author,
                                     key,
-                                    postId
+                                    postId,
+                                    userId
                             ));
                             Utility.allCommentsLoaded(commentsList, recyclerView, getContext());
                         }
@@ -110,7 +131,7 @@ public class CommentFragment extends BottomSheetDialogFragment {
                         }
                     });
                 }
-                // TODO system zapisywania i odczytywania komentarzy
+                // TODO system zapisywania - automatycznie wyswietl nowy
             }
 
             @Override

@@ -61,7 +61,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
 
         View.OnClickListener listener = v -> {
             Intent intent = new Intent(context, UserProfileActivity.class);
-            intent.putExtra("author", item.getAuthor());
+            intent.putExtra("Author", item.getUid());
             context.startActivity(intent);
         };
         holder.userProfileImage.setOnClickListener(listener);
@@ -75,11 +75,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
             holder.likeButton.setColorFilter(ContextCompat.getColor(context, R.color.red), PorterDuff.Mode.SRC_IN);
         }
 
-        databaseReference = Utility.getUsersPhotosCollectionReference();
-
         holder.likeButton.setOnClickListener(v -> {
             likeAmount = item.getLikes();
-            databaseReference = databaseReference.child(item.getUid()).child(item.getPostId())
+            databaseReference = Utility.getUsersPhotosCollectionReference().child(item.getAuthorPostId()).child(item.getPostId())
                     .child("comments").child(item.getKey());
 
             if (!item.isUserLiked()){

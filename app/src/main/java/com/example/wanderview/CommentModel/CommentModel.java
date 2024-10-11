@@ -10,9 +10,10 @@ public class CommentModel {
     String uid;
     String key;
     String postId;
+    String authorPostId;
 
     public CommentModel(String profileImageUrl, String author, long seconds, String text, long likes,
-                        boolean isUserLiked, String uid, String key, String postId) {
+                        boolean isUserLiked, String uid, String key, String postId, String authorPostId) {
         this.profileImageUrl = profileImageUrl;
         this.author = author;
         this.seconds = seconds;
@@ -22,6 +23,7 @@ public class CommentModel {
         this.uid = uid;
         this.key = key;
         this.postId = postId;
+        this.authorPostId = authorPostId;
     }
 
     public String getProfileImageUrl() { return profileImageUrl; }
@@ -41,6 +43,8 @@ public class CommentModel {
     public String getKey() { return key; }
 
     public String getPostId() { return postId; }
+
+    public String getAuthorPostId() { return authorPostId; }
 
     public void setLikes(long likes) { this.likes = likes; }
 }
