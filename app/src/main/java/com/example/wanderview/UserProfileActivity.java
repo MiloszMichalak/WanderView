@@ -16,6 +16,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -50,6 +51,7 @@ public class UserProfileActivity extends AppCompatActivity {
     ImageButton userOption;
     SwipeRefreshLayout swipeRefreshLayout;
     Toolbar toolbar;
+    LifecycleOwner lifecycleOwner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +63,8 @@ public class UserProfileActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        lifecycleOwner = this;
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -154,8 +158,6 @@ public class UserProfileActivity extends AppCompatActivity {
         fetchImagesFromStorage(databaseReference);
     }
 
-    // todo dodac ze jak user usuwa posta to odswieza mu adapter
-
     public void fetchImagesFromStorage(DatabaseReference databaseReference){
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -193,7 +195,7 @@ public class UserProfileActivity extends AppCompatActivity {
                                     likes,
                                     likedByCurrentUser,
                                     commentsAmount));
-                            Utility.allImagesLoaded(imageModels, recyclerView, getApplicationContext(), progressBar, false, getSupportFragmentManager());
+                            Utility.allImagesLoaded(imageModels, recyclerView, getApplicationContext(), progressBar, false, getSupportFragmentManager(), lifecycleOwner);
                         }
 
                         @Override

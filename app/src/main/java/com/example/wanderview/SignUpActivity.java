@@ -85,14 +85,14 @@ public class SignUpActivity extends AppCompatActivity {
             }
 
             if (Utility.isValidPassword(password)) {
-                passwordEditText.setError(getString(R.string.invalid_password));
+                passwordEditText.setError(getString(R.string.to_short_password));
             }
 
             infoDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()){
-                        if (snapshot.child("username").getValue(String.class).equalsIgnoreCase(username.toLowerCase())){
+                        if (snapshot.child("username").getValue(String.class).equalsIgnoreCase(username)){
                             isValidData = false;
                             usernameEditText.setError(getString(R.string.taken_username));
                             break;

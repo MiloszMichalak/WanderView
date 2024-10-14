@@ -12,6 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -36,13 +37,15 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     long likeAmmount;
     View.OnClickListener listener;
     RecyclerView recyclerView;
+    LifecycleOwner lifecycleOwner;
 
-    public ImageAdapter(Context context, List<ImageModel> imageModels, boolean isClickable, FragmentManager fragmentManager, RecyclerView recyclerView){
+    public ImageAdapter(Context context, List<ImageModel> imageModels, boolean isClickable, FragmentManager fragmentManager, RecyclerView recyclerView, LifecycleOwner lifecycleOwner){
         this.context = context;
         this.imageModels = imageModels;
         this.isClickable = isClickable;
         this.fragmentManager = fragmentManager;
         this.recyclerView = recyclerView;
+        this.lifecycleOwner = lifecycleOwner;
     }
 
     @NonNull
@@ -90,6 +93,14 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
         holder.postOptions.setOnClickListener(v -> {
             PostOptionsFragment postOptionsFragment = PostOptionsFragment.newBottomFragment(item.getKey());
+
+            fragmentManager.setFragmentResultListener("result", lifecycleOwner, (requestKey, result) -> {
+                if (result.getBoolean("resultBool")){
+                    imageModels.remove(position);
+                    notifyItemRemoved(position);
+                }
+            });
+
             postOptionsFragment.show(fragmentManager, "postOptions");
         });
 
@@ -160,11 +171,10 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             context.startActivity(intent);
         });
 
-        // todo ilosc komentarzy
         holder.commentAmount.setText(String.valueOf(item.getCommentAmount()));
 
         holder.commentButton.setOnClickListener(v -> {
-            CommentFragment commentFragment = CommentFragment.newCommentFragment(item.getKey(), item.getUid());
+            CommentFragment commentFragment = CommentFragment.newCommentFragment(item.getKey(), item.getUid(), item.getAuthor());
             commentFragment.show(fragmentManager, "comments");
         });
     }

@@ -1,17 +1,18 @@
 package com.example.wanderview;
 
 import android.content.Context;
-import android.content.Intent;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wanderview.CommentModel.CommentAdapter;
@@ -77,8 +78,8 @@ public class Utility {
     }
 
     public static void allImagesLoaded(List<ImageModel> imageModels, RecyclerView recyclerView, Context context, ProgressBar progressBar, boolean isClickable,
-                                       FragmentManager fragmentManager){
-        ImageAdapter adapter = new ImageAdapter(context, imageModels, isClickable, fragmentManager, recyclerView);
+                                       FragmentManager fragmentManager, LifecycleOwner lifecycleOwner){
+        ImageAdapter adapter = new ImageAdapter(context, imageModels, isClickable, fragmentManager, recyclerView, lifecycleOwner);
         recyclerView.setAdapter(adapter);
         recyclerView.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.INVISIBLE);
@@ -122,7 +123,7 @@ public class Utility {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (count == 0){
+                if (s.length() == 0){
                     saveInfo.setEnabled(false);
                     saveInfo.setAlpha(0.5f);
                 } else {
@@ -161,11 +162,30 @@ public class Utility {
         }
     }
 
-    public static View.OnClickListener listenerForCommentUser(Context context, String uid){
-        return v -> {
-            Intent intent = new Intent(context, UserProfileActivity.class);
-            intent.putExtra("Author", uid);
-            context.startActivity(intent);
-        };
+    public static void disableImageView(EditText editText, ImageView addCommentBtn) {
+        addCommentBtn.setEnabled(false);
+        addCommentBtn.setAlpha(0.5f);
+
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() == 0){
+                    addCommentBtn.setEnabled(false);
+                    addCommentBtn.setAlpha(0.5f);
+                } else {
+                    addCommentBtn.setEnabled(true);
+                    addCommentBtn.setAlpha(1f);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
 }

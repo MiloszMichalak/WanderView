@@ -24,7 +24,6 @@ public class PostOptionsFragment extends BottomSheetDialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_post_options, container, false);
 
         if (getArguments() != null){
@@ -35,11 +34,17 @@ public class PostOptionsFragment extends BottomSheetDialogFragment {
 
         storageReference = Utility.getUsersPhotosReference().child(currentUser.getUid()).child(postId);
         databaseReference = Utility.getUsersPhotosCollectionReference().child(currentUser.getUid()).child(postId);
+
         deletePost =  view.findViewById(R.id.deletePost);
 
         deletePost.setOnClickListener(v -> {
             databaseReference.removeValue();
-            storageReference.delete().addOnSuccessListener(unused -> dismiss());
+            storageReference.delete().addOnSuccessListener(unused -> {
+                Bundle result = new Bundle();
+                result.putBoolean("resultBool", true);
+                getParentFragmentManager().setFragmentResult("result", result);
+                dismiss();
+            });
         });
 
         return view;
