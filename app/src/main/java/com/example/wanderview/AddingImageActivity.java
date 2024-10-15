@@ -81,25 +81,26 @@ public class AddingImageActivity extends AppCompatActivity {
             if (photoUri != null){
                 storageReference = storageReference.child(currentUser.getUid()).child(key);
 
+                Map<String, Object> imageMetadata = new HashMap<>() ;
+                imageMetadata.put("author", currentUser.getUid());
+                imageMetadata.put("title", title);
+                imageMetadata.put("date", Timestamp.now().getSeconds());
+                databaseReference.setValue(imageMetadata);
+
                 storageReference.putFile(photoUri)
                         .addOnSuccessListener(taskSnapshot -> {
                             storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
                                String imageUrl = uri.toString();
-
-                               Map<String, Object> imageMetadata = new HashMap<>() ;
-                               imageMetadata.put("url", imageUrl);
-                               imageMetadata.put("author", currentUser.getUid());
-                               imageMetadata.put("title", title);
-                               imageMetadata.put("date", Timestamp.now().getSeconds());
-                               databaseReference.setValue(imageMetadata);
+                               databaseReference.child("url").setValue(imageUrl);
                             });
                         });
+
+                setResult(RESULT_OK, intent);
+                intent.putExtra("photoUrl", photoUri.toString());
+                intent.putExtra("title", title);
+                intent.putExtra("key", key);
+                finish();
             }
-            setResult(RESULT_OK, intent);
-            intent.putExtra("photoUrl", photoUri.toString());
-            intent.putExtra("title", title);
-            intent.putExtra("key", key);
-            finish();
         });
     }
 }

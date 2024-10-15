@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     SwipeRefreshLayout swipeRefreshLayout;
     LifecycleOwner lifecycleOwner;
 
-    private ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), o -> {
+    private final ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), o -> {
         if (o.getResultCode() == RESULT_OK){
             Intent data = o.getData();
             if (data != null){
@@ -66,7 +66,8 @@ public class MainActivity extends AppCompatActivity {
                                 Timestamp.now().getSeconds(),
                                 0,
                                 false,
-                                0
+                                0,
+                                true
                         ));
                         recyclerView.getAdapter().notifyItemInserted(0);
                         recyclerView.smoothScrollToPosition(0);

@@ -122,6 +122,10 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         holder.userProfileImage.setOnClickListener(listener);
         holder.imageAuthor.setOnClickListener(listener);
 
+        if (item.isTemp() || item.getImageUrl() == null){
+            holder.postOptions.setVisibility(View.INVISIBLE);
+        }
+
         likeAmmount = item.getLikes();
 
         Utility.hideLikesIf0Comments(likeAmmount, holder.likeAmmount);
