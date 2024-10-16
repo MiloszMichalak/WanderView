@@ -173,7 +173,6 @@ public class CommentFragment extends BottomSheetDialogFragment {
                         }
                     });
                 }
-                // TODO system zapisywania - automatycznie wyswietl nowy
             }
 
             @Override

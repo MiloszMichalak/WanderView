@@ -38,6 +38,7 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class Utility {
+
     public static boolean isValidEmail(CharSequence email){
         return (TextUtils.isEmpty(email) || !Patterns.EMAIL_ADDRESS.matcher(email).matches());
     }

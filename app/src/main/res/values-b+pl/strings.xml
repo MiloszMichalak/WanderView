@@ -38,5 +38,6 @@
     <string name="add_comment">Dodaj komentarz  dla</string>
     <string name="delete_comment">Usuń komentarz</string>
     <string name="to_short_password">Hasło musi miec minimum 8 znaków</string>
+    <string name="no_user">Nie ma takiego użytkownika</string>
 
 </resources>

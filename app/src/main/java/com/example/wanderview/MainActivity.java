@@ -2,85 +2,35 @@ package com.example.wanderview;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 
 import androidx.activity.EdgeToEdge;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.wanderview.PostModel.ImageModel;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.Timestamp;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 public class MainActivity extends AppCompatActivity {
-
-    FirebaseUser currentUser;
-    FloatingActionButton addImageBtn;
-    RecyclerView recyclerView;
     ImageView userProfileSettings;
-    ProgressBar progressBar;
-    List<ImageModel> imageModels = new ArrayList<>();
-    DatabaseReference databaseReference, infoDatabaseReference;
+    FirebaseUser currentUser;
+    DatabaseReference infoDatabaseReference;
     String username;
     String photoUrl;
-    SwipeRefreshLayout swipeRefreshLayout;
-    LifecycleOwner lifecycleOwner;
-
-    private final ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), o -> {
-        if (o.getResultCode() == RESULT_OK){
-            Intent data = o.getData();
-            if (data != null){
-                // todo dalej pobiera dane
-                infoDatabaseReference.child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        imageModels.add(0, new ImageModel(
-                                data.getStringExtra("photoUrl"),
-                                data.getStringExtra("title"),
-                                snapshot.child("username").getValue(String.class),
-                                photoUrl,
-                                currentUser.getUid(),
-                                data.getStringExtra("key"),
-                                Timestamp.now().getSeconds(),
-                                0,
-                                false,
-                                0,
-                                true
-                        ));
-                        recyclerView.getAdapter().notifyItemInserted(0);
-                        recyclerView.smoothScrollToPosition(0);
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-            }
-        }
-    });
+    BottomNavigationView bottomNavigationView;
+    Fragment homeFragment = new HomeFragment();
+    Fragment searchFragment = new SearchFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,17 +42,17 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
-        lifecycleOwner = this;
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
         currentUser = Utility.getCurrentUser();
 
-        addImageBtn = findViewById(R.id.addImageBtn);
-
-        progressBar = findViewById(R.id.progressBar);
-
-        databaseReference = Utility.getUsersPhotosCollectionReference();
         infoDatabaseReference = Utility.getUsersInfoCollectionReference();
+
+        userProfileSettings = findViewById(R.id.userProfileImage);
+        userProfileSettings.setOnClickListener(v -> startActivity(new Intent(this, UserProfileActivity.class)));
+
+        bottomNavigationView = findViewById(R.id.bottomNavigation);
 
         infoDatabaseReference.child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -122,97 +72,25 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        addImageBtn.setOnClickListener(v -> {
-            resultLauncher.launch(new Intent(this, AddingImageActivity.class));
-        });
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new HomeFragment())
+                .commit();
 
-        recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            Fragment fragmentSelected = null;
 
-        userProfileSettings = findViewById(R.id.userProfileImage);
-
-        userProfileSettings.setOnClickListener(v -> startActivity(new Intent(this, UserProfileActivity.class)));
-
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                swipeRefreshLayout.setEnabled(!recyclerView.canScrollVertically(-1));
-            }
-        });
-
-        swipeRefreshLayout = findViewById(R.id.swipeRefresh);
-
-        swipeRefreshLayout.setProgressBackgroundColorSchemeResource(R.color.colorSecondary);
-        swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
-
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            progressBar.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.INVISIBLE);
-            fetchImagesFromStorage(databaseReference);
-            swipeRefreshLayout.setRefreshing(false);
-        });
-
-        // todo wyswietlenie swiezo dodanego posta do tego adaptera na samej gorze
-
-        fetchImagesFromStorage(databaseReference);
-    }
-
-
-    public void fetchImagesFromStorage(DatabaseReference databaseReference){
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                imageModels.clear();
-
-                for (DataSnapshot userSnapshot : dataSnapshot.getChildren()){
-
-                    for (DataSnapshot imageSnapshot : userSnapshot.getChildren()){
-                        String author = imageSnapshot.child("author").getValue(String.class);
-                        String imageUrl = imageSnapshot.child("url").getValue(String.class);
-                        String title = imageSnapshot.child("title").getValue(String.class);
-                        Long date = imageSnapshot.child("date").getValue(Long.class);
-                        String key = imageSnapshot.getKey();
-
-                        if (!author.equals(currentUser.getUid())){
-                            boolean likedByCurrentUser = imageSnapshot.child("likes").child(currentUser.getUid()).exists();
-                            infoDatabaseReference.child(author).addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    long likes = imageSnapshot.child("likes").getChildrenCount();
-                                    long commentsAmount = imageSnapshot.child("comments").getChildrenCount();
-
-                                    imageModels.add(new ImageModel(
-                                            imageUrl,
-                                            title,
-                                            snapshot.child("username").getValue(String.class),
-                                            snapshot.child("photoUrl").getValue(String.class),
-                                            author,
-                                            key,
-                                            date,
-                                            likes,
-                                            likedByCurrentUser,
-                                            commentsAmount
-                                    ));
-
-                                    Utility.allImagesLoaded(imageModels, recyclerView, getApplicationContext(), progressBar, true, getSupportFragmentManager(), lifecycleOwner);
-                                    Collections.shuffle(imageModels);
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
-
-                                }
-                            });
-                        }
-                    }
-                }
+            if (item.getItemId() == R.id.home){
+                fragmentSelected = homeFragment;
+            } else if (item.getItemId() == R.id.search){
+                fragmentSelected = searchFragment;
             }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
+            if (fragmentSelected != null){
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, fragmentSelected)
+                        .commit();
             }
+            return true;
         });
     }
 }

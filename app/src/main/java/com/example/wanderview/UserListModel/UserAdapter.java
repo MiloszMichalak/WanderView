@@ -45,6 +45,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         Glide.with(context)
                 .load(item.getProfilePhotoUrl())
                 .apply(RequestOptions.circleCropTransform())
+                .error(R.drawable.profile_default)
                 .into(holder.userProfileImage);
 
         holder.main.setOnClickListener(v -> {

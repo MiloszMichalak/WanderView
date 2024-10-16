@@ -133,6 +133,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         if (item.isUserLiked){
             holder.likeButton.setColorFilter(ContextCompat.getColor(context, R.color.red), PorterDuff.Mode.SRC_IN);
         }
+        holder.likeButton.setColorFilter(null);
 
             holder.likeButton.setOnClickListener(v -> {
                 likeAmmount = item.getLikes();

@@ -42,5 +42,6 @@
     <string name="add_comment">Add comment for</string>
     <string name="delete_comment">Delete comment</string>
     <string name="to_short_password">Password must have minimum 8 characters</string>
+    <string name="no_user">There are no users with that username</string>
 
 </resources>
