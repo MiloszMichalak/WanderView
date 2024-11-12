@@ -42,6 +42,7 @@ public class HomeFragment extends Fragment {
     LifecycleOwner lifecycleOwner;
     View view;
     ImageAdapter adapter;
+    LinearLayoutManager linearLayoutManager;
 
     private final ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), o -> {
         if (o.getResultCode() == Activity.RESULT_OK) {
@@ -132,7 +133,8 @@ public class HomeFragment extends Fragment {
     }
 
     private void setupRecyclerView() {
-        recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
+        linearLayoutManager = new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(linearLayoutManager);
         fetchItemsFromStorage(databaseReference);
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -140,6 +142,23 @@ public class HomeFragment extends Fragment {
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 swipeRefreshLayout.setEnabled(!recyclerView.canScrollVertically(-1));
+            }
+
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState == RecyclerView.SCROLL_STATE_DRAGGING){
+                    int firstVisible = linearLayoutManager.findFirstVisibleItemPosition();
+                    int lastVisible = linearLayoutManager.findLastVisibleItemPosition();
+
+                    for (int i = 0; i < adapter.getItemCount(); i++) {
+                        if (i < firstVisible || i > lastVisible){
+                            adapter.pauseVideoAtPosition(i);
+                        } else {
+                            adapter.resumeVideoAtPosition(i);
+                        }
+                    }
+                }
             }
         });
     }
@@ -191,7 +210,7 @@ public class HomeFragment extends Fragment {
                                     ));
                                     if (imageModels.size() == dataSnapshot.getChildrenCount()) {
                                         Collections.shuffle(imageModels);
-                                        Utility.allImagesLoaded(imageModels, recyclerView, getContext(), progressBar, true, getActivity().getSupportFragmentManager(), lifecycleOwner);
+                                        adapter = Utility.allImagesLoaded(imageModels, recyclerView, getContext(), progressBar, true, getActivity().getSupportFragmentManager(), lifecycleOwner);
                                     }
                                 }
 

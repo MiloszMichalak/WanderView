@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.net.Uri;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,13 +35,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
-    List<ImageModel> imageModels;
-    final Context context;
-    boolean isClickable;
-    FragmentManager fragmentManager;
-    RecyclerView recyclerView;
-    LifecycleOwner lifecycleOwner;
-    List<ImageAdapter.ViewHolder> viewHolders = new ArrayList<>();
+    private List<ImageModel> imageModels;
+    private final Context context;
+    private boolean isClickable;
+    private final FragmentManager fragmentManager;
+    private final RecyclerView recyclerView;
+    private final LifecycleOwner lifecycleOwner;
+    private List<ImageAdapter.ViewHolder> viewHolders = new ArrayList<>();
+    private SparseArray<ExoPlayer> playerMap = new SparseArray<>();
 
     public ImageAdapter(Context context, List<ImageModel> imageModels, boolean isClickable, FragmentManager fragmentManager, RecyclerView recyclerView, LifecycleOwner lifecycleOwner) {
         this.context = context;
@@ -63,6 +65,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         ImageModel item = imageModels.get(position);
         holder.bind(item, context, fragmentManager, isClickable, recyclerView, position, lifecycleOwner, imageModels);
 
+        playerMap.put(position, holder.exoPlayer);
         if (item.getType().equals("video") && !viewHolders.contains(holder)){
             viewHolders.add(holder);
         }
@@ -92,6 +95,20 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     public void resetAll(){
         for (ImageAdapter.ViewHolder holder : viewHolders){
             holder.exoPlayer.release();
+        }
+    }
+
+    public void pauseVideoAtPosition(int position){
+        ExoPlayer player = playerMap.get(position);
+        if (player != null && player.isPlaying()){
+            player.stop();
+        }
+    }
+
+    public void resumeVideoAtPosition(int position){
+        ExoPlayer player = playerMap.get(position);
+        if (player != null && !player.isPlaying()){
+            player.play();
         }
     }
 
@@ -251,12 +268,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
         private void loadImage(Context context, ImageModel item) {
             if (item.getType().equals("video")) {
-                imageView.setVisibility(View.INVISIBLE);
+                imageView.setVisibility(View.GONE);
                 playerView.setVisibility(View.VISIBLE);
 
                 exoPlayer = new ExoPlayer.Builder(context).build();
                 exoPlayer.setRepeatMode(Player.REPEAT_MODE_ONE);
-
                 playerView.setPlayer(exoPlayer);
 
                 MediaItem mediaItem = MediaItem.fromUri(Uri.parse(item.getImageUrl()));
