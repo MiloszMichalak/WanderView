@@ -11,10 +11,10 @@ public class ImageModel {
     long likes;
     boolean isUserLiked;
     long commentAmount;
-    boolean isTemp;
+    String type;
 
     public ImageModel(String imageUrl, String title, String author, String userProfileImage, String uid, String key,
-                      long timestamp, long likes, boolean isUserLiked, long commentAmount){
+                      long timestamp, long likes, boolean isUserLiked, long commentAmount, String type){
         this.imageUrl = imageUrl;
         this.title = title;
         this.author = author;
@@ -25,30 +25,12 @@ public class ImageModel {
         this.likes = likes;
         this.isUserLiked = isUserLiked;
         this.commentAmount = commentAmount;
+        this.type = type;
     }
 
-    public ImageModel(String imageUrl, String title, String author, String userProfileImage, String uid, String key,
-                      long timestamp, long likes, boolean isUserLiked, long commentAmount, boolean isTemp){
-        this.imageUrl = imageUrl;
-        this.title = title;
-        this.author = author;
-        this.userProfileImage = userProfileImage;
-        this.uid = uid;
-        this.key = key;
-        this.timestamp = timestamp;
-        this.likes = likes;
-        this.isUserLiked = isUserLiked;
-        this.commentAmount = commentAmount;
-        this.isTemp = isTemp;
-    }
+    public String getImageUrl() { return imageUrl; }
 
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public String getTitle() {
-        return title;
-    }
+    public String getTitle() { return title; }
 
     public String getAuthor() {return author; }
 
@@ -64,7 +46,7 @@ public class ImageModel {
 
     public long getCommentAmount() { return commentAmount; }
 
-    public boolean isTemp() { return isTemp; }
+    public String getType() { return type; }
 
     public void setLikes(long likes) { this.likes = likes; }
 }

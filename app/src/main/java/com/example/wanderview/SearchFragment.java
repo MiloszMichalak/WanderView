@@ -31,23 +31,17 @@ public class SearchFragment extends Fragment {
     RecyclerView recyclerView;
     TextView noUsers;
     Runnable searchRunnable;
+    View view;
+    Handler handler;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_search, container, false);
+        view = inflater.inflate(R.layout.fragment_search, container, false);
 
-        editText = view.findViewById(R.id.contentEditText);
-
-        recyclerView = view.findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
-
+        setupUi();
         infoDatabaseReference = Utility.getUsersInfoCollectionReference();
-
-        noUsers = view.findViewById(R.id.noUsers);
-
-        Handler handler = new Handler();
-
+        handler = new Handler();
         editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -56,43 +50,7 @@ public class SearchFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String text = s.toString().toLowerCase();
-                recyclerView.setAdapter(null);
-                noUsers.setVisibility(View.INVISIBLE);
-
-                if (searchRunnable != null){
-                    handler.removeCallbacks(searchRunnable);
-                }
-
-                if (count != 0){
-                     searchRunnable = () -> infoDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            users.clear();
-                            for (DataSnapshot snapshot : dataSnapshot.getChildren()){
-                                String username = snapshot.child("username").getValue(String.class);
-                                if (username.toLowerCase().contains(text)){
-                                    users.add(new UserModel(snapshot.getKey(),
-                                            username,
-                                            snapshot.child("photoUrl").getValue(String.class)));
-                                }
-                            }
-
-                            if (users.isEmpty()){
-                                noUsers.setVisibility(View.VISIBLE);
-                            } else {
-                                Utility.allUsersLoaded(users, recyclerView, view.getContext());
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
-                    });
-
-                     handler.postDelayed(searchRunnable, 200);
-                }
+                handleTextChange(s.toString());
             }
 
             @Override
@@ -102,5 +60,66 @@ public class SearchFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private void handleTextChange(String s) {
+        String text = s.toLowerCase();
+        recyclerView.setAdapter(null);
+        noUsers.setVisibility(View.INVISIBLE);
+
+        if (searchRunnable != null){
+            handler.removeCallbacks(searchRunnable);
+        }
+
+        if (!text.isEmpty()){
+            searchRunnable = () -> searchUsersInDatabase(text);
+            handler.postDelayed(searchRunnable, 200);
+        }
+    }
+
+    private void searchUsersInDatabase(String text) {
+        infoDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                users.clear();
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    String username = snapshot.child("username").getValue(String.class);
+                    if (username.toLowerCase().startsWith(text)){
+                        users.add(new UserModel(
+                                snapshot.getKey(),
+                                username,
+                                snapshot.child("photoUrl").getValue(String.class)));
+                    }
+                }
+
+                updateUserList();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        handler.postDelayed(searchRunnable, 200);
+    }
+
+    private void updateUserList() {
+        if (users.isEmpty()){
+            recyclerView.setAdapter(null);
+            noUsers.setVisibility(View.VISIBLE);
+        } else {
+            noUsers.setVisibility(View.INVISIBLE);
+            Utility.allUsersLoaded(users, recyclerView, view.getContext());
+        }
+    }
+
+    private void setupUi() {
+        editText = view.findViewById(R.id.contentEditText);
+        recyclerView = view.findViewById(R.id.recyclerView);
+        noUsers = view.findViewById(R.id.noUsers);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
     }
 }

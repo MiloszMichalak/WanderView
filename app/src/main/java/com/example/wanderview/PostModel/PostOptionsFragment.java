@@ -20,34 +20,51 @@ public class PostOptionsFragment extends BottomSheetDialogFragment {
     StorageReference storageReference;
     TextView deletePost;
     FirebaseUser currentUser;
+    View view;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_post_options, container, false);
+        view = inflater.inflate(R.layout.fragment_post_options, container, false);
 
         if (getArguments() != null){
             postId = getArguments().getString("postId");
         }
 
-        currentUser = Utility.getCurrentUser();
+        initializeFirebaseAuth();
+        deletePostListener();
 
-        storageReference = Utility.getUsersPhotosReference().child(currentUser.getUid()).child(postId);
-        databaseReference = Utility.getUsersPhotosCollectionReference().child(currentUser.getUid()).child(postId);
+        return view;
+    }
 
+    private void deletePostListener() {
         deletePost =  view.findViewById(R.id.deletePost);
 
         deletePost.setOnClickListener(v -> {
-            databaseReference.removeValue();
-            storageReference.delete().addOnSuccessListener(unused -> {
-                Bundle result = new Bundle();
-                result.putBoolean("resultBool", true);
-                getParentFragmentManager().setFragmentResult("result", result);
-                dismiss();
-            });
+            deleteDatabaseEntry();
+            deleteStorageEntry();
         });
+    }
 
-        return view;
+    private void deleteStorageEntry() {
+        databaseReference.removeValue();
+    }
+
+    private void deleteDatabaseEntry() {
+        storageReference.delete().addOnSuccessListener(unused -> handleDeletionSucces());
+    }
+
+    private void handleDeletionSucces() {
+        Bundle result = new Bundle();
+        result.putBoolean("resultBool", true);
+        getParentFragmentManager().setFragmentResult("result", result);
+        dismiss();
+    }
+
+    private void initializeFirebaseAuth() {
+        currentUser = Utility.getCurrentUser();
+        storageReference = Utility.getUsersPhotosReference().child(currentUser.getUid()).child(postId);
+        databaseReference = Utility.getUsersPhotosCollectionReference().child(currentUser.getUid()).child(postId);
     }
 
     public static PostOptionsFragment newBottomFragment(String postId){

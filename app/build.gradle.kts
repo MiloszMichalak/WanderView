@@ -53,6 +53,7 @@ android {
         implementation(libs.glide)
         implementation(libs.imagepicker)
         implementation(libs.swiperefreshlayout)
+        implementation(libs.exoplayer)
         testImplementation(libs.junit)
         androidTestImplementation(libs.ext.junit)
         androidTestImplementation(libs.espresso.core)

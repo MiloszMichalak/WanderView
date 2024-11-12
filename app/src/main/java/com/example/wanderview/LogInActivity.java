@@ -26,81 +26,100 @@ public class LogInActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null){
-            startActivity(new Intent(getApplicationContext(), MainActivity.class));
-            finish();
-        }
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            navigateToMain();
+        }
+
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_log_in);
+
+        setupUi();
+        setupListeners();
+    }
+
+    private void setupListeners() {
+        swapToSignUp.setOnClickListener(v -> {
+            startActivity(new Intent(getApplicationContext(), SignUpActivity.class));
+            finish();
+        });
+
+        logInBtn.setOnClickListener(view -> {
+            String email = editTextEmail.getEditText().getText().toString().trim();
+            String password = editTextPassword.getEditText().getText().toString().trim();
+
+            if (isInputValid(email, password)) {
+                performLogin(email, password);
+            }
+        });
+    }
+
+    private void performLogin(String email, String password) {
+        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                handleSuccessFulLogin();
+            } else {
+                handleFailLogin();
+            }
+        });
+    }
+
+    private void handleFailLogin() {
+        editTextEmail.setError("\t");
+        editTextPassword.setError(getString(R.string.invalid_data));
+    }
+
+    private void handleSuccessFulLogin() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null && !currentUser.isEmailVerified()) {
+            Toast.makeText(getApplicationContext(), R.string.must_verify, Toast.LENGTH_SHORT).show();
+            mAuth.signOut();
+        } else {
+            navigateToMain();
+        }
+    }
+
+    private boolean isInputValid(String email, String password) {
+        boolean isValidData = !Utility.isValidEmail(email) && !Utility.isValidPassword(password);
+
+        if (Utility.isValidEmail(email)) {
+            editTextEmail.setError(getString(R.string.invalid_email));
+        } else {
+            editTextEmail.setError(null);
+        }
+
+        if (Utility.isValidPassword(password)) {
+            editTextPassword.setError(getString(R.string.invalid_password));
+        } else {
+            editTextPassword.setError(null);
+        }
+
+        return isValidData;
+    }
+
+    private void navigateToMain() {
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+        finish();
+    }
+
+    private void setupUi() {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        mAuth = FirebaseAuth.getInstance();
-
         swapToSignUp = findViewById(R.id.swapToSignUp);
-
-        swapToSignUp.setOnClickListener(v -> {
-            startActivity(new Intent(getApplicationContext(), SignUpActivity.class));
-            finish();
-        });
-
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextPassword = findViewById(R.id.editTextPassword);
-
         logInBtn = findViewById(R.id.logInButton);
-
         emailEdit = findViewById(R.id.emailEdit);
         passwordEdit = findViewById(R.id.passwordEdit);
 
         Utility.deleteError(emailEdit, editTextEmail);
         Utility.deleteError(passwordEdit, editTextPassword);
-
-        logInBtn.setOnClickListener(view -> {
-            String email = editTextEmail.getEditText().getText().toString().trim();
-            String password = editTextPassword.getEditText().getText().toString().trim();
-
-            boolean isValidData;
-
-            isValidData = !Utility.isValidEmail(email) && !Utility.isValidPassword(password);
-
-            if (Utility.isValidEmail(email)) {
-                editTextEmail.setError(getString(R.string.invalid_email));
-            }
-
-            if (Utility.isValidPassword(password)) {
-                editTextPassword.setError(getString(R.string.invalid_password));
-            }
-
-            if (isValidData){
-                mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
-                    if (task.isSuccessful()){
-                        FirebaseUser currentUser = mAuth.getCurrentUser();
-                        if (!currentUser.isEmailVerified()){
-                            Toast.makeText(getApplicationContext(), R.string.must_verify, Toast.LENGTH_SHORT).show();
-                            mAuth.signOut();
-                        } else {
-                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                            finish();
-                        }
-                    } else {
-                        editTextEmail.setError("\t");
-                        editTextPassword.setError(getString(R.string.invalid_data));
-                    }
-                });
-            }
-        });
-
-
     }
 }

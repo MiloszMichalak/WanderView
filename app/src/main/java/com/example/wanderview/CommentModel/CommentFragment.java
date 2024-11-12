@@ -42,104 +42,50 @@ public class CommentFragment extends BottomSheetDialogFragment {
     TextInputLayout commentContent;
     ImageView imageView;
     String username;
+    View view;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_comment, container, false);
+        view = inflater.inflate(R.layout.fragment_comment, container, false);
 
-        BottomSheetDialog dialog = (BottomSheetDialog) getDialog();
-        BottomSheetBehavior<FrameLayout> behavior = dialog.getBehavior();
+        setupUi();
+        retrieveArguments();
+        initializeFirebaseAuth();
+        fetchUsersInfoFromDatabase();
 
-        behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        behavior.setSkipCollapsed(true);
+        addCommentBtn.setOnClickListener(v -> handleAddCommentClick());
 
-        recyclerView = view.findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        fetchCommentsFromDatabase();
+        commentContent.getEditText().setHint(getString(R.string.add_comment) + " " + username);
 
-        currentUser = Utility.getCurrentUser();
+        return view;
+    }
 
-        if (getArguments() != null){
-            postId = getArguments().getString("postId");
-            userId = getArguments().getString("userId");
-            username = getArguments().getString("username");
-        }
+    private void handleAddCommentClick() {
+        String content = commentContent.getEditText().getText().toString();
+        Map<String, Object> commentData = createCommentData(content);
 
-        databaseReference = Utility.getUsersPhotosCollectionReference().child(userId).child(postId).child("comments");
-        infoDatabaseReference = Utility.getUsersInfoCollectionReference();
+        showAddedComment(content, commentData);
+        commentContent.getEditText().setText(null);
+    }
 
-        imageView = view.findViewById(R.id.userProfileImage);
+    private Map<String, Object> createCommentData(String content) {
+        Map<String, Object> commentData = new HashMap<>();
 
-        infoDatabaseReference.child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Glide.with(view.getContext())
-                        .load(snapshot.child("photoUrl").getValue(String.class))
-                        .circleCrop()
-                        .into(imageView);
-            }
+        commentData.put("author", currentUser.getUid());
+        commentData.put("timestamp", Timestamp.now().getSeconds());
+        commentData.put("commentContent", content);
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+        return commentData;
+    }
 
-            }
-        });
-
-        addCommentBtn = view.findViewById(R.id.addCommentBtn);
-
-        commentContent = view.findViewById(R.id.commentContentEditText);
-
-        addCommentBtn.setOnClickListener(v -> {
-            String content = commentContent.getEditText().getText().toString();
-            Map<String, Object> commentData = new HashMap<>();
-
-            commentData.put("author", currentUser.getUid());
-            commentData.put("timestamp", Timestamp.now().getSeconds());
-            commentData.put("commentContent", content);
-
-            infoDatabaseReference.child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    databaseReference = databaseReference.push();
-                    String key = databaseReference.getKey();
-
-                    databaseReference.setValue(commentData).addOnSuccessListener(unused -> {
-                        commentsList.add(new CommentModel(snapshot.child("photoUrl").getValue(String.class),
-                                snapshot.child("username").getValue(String.class),
-                                Timestamp.now().getSeconds(),
-                                content,
-                                0,
-                                false,
-                                currentUser.getUid(),
-                                key,
-                                postId,
-                                userId
-                        ));
-
-                        if (recyclerView.getAdapter() == null){
-                            Utility.allCommentsLoaded(commentsList, recyclerView, getContext());
-                        }
-
-                        recyclerView.getAdapter().notifyItemInserted(commentsList.size() - 1);
-                        recyclerView.smoothScrollToPosition(commentsList.size() - 1);
-                    });
-                }
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-
-            commentContent.getEditText().setText(null);
-        });
-
-        Utility.disableImageView(commentContent.getEditText(), addCommentBtn);
-
+    private void fetchCommentsFromDatabase() {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 commentsList.clear();
-                for (DataSnapshot commentSnapshot : snapshot.getChildren()){
+                for (DataSnapshot commentSnapshot : snapshot.getChildren()) {
 
                     String author = commentSnapshot.child("author").getValue(String.class);
                     String commentContent = commentSnapshot.child("commentContent").getValue(String.class);
@@ -165,6 +111,7 @@ public class CommentFragment extends BottomSheetDialogFragment {
                                     userId
                             ));
                             Utility.allCommentsLoaded(commentsList, recyclerView, getContext());
+
                         }
 
                         @Override
@@ -180,12 +127,99 @@ public class CommentFragment extends BottomSheetDialogFragment {
 
             }
         });
-        commentContent.getEditText().setHint(getString(R.string.add_comment) + " " + username);
-
-        return view;
     }
 
-    public static CommentFragment newCommentFragment(String postId, String userId, String username){
+    private void showAddedComment(String content, Map<String, Object> commentData) {
+        infoDatabaseReference.child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                databaseReference = databaseReference.push();
+                String key = databaseReference.getKey();
+
+                databaseReference.setValue(commentData).addOnSuccessListener(unused -> {
+                    commentsList.add(new CommentModel(snapshot.child("photoUrl").getValue(String.class),
+                            snapshot.child("username").getValue(String.class),
+                            Timestamp.now().getSeconds(),
+                            content,
+                            0,
+                            false,
+                            currentUser.getUid(),
+                            key,
+                            postId,
+                            userId
+                    ));
+
+                    if (recyclerView.getAdapter() == null) {
+                        Utility.allCommentsLoaded(commentsList, recyclerView, getContext());
+                    }
+
+                    recyclerView.getAdapter().notifyItemInserted(commentsList.size() - 1);
+                    recyclerView.smoothScrollToPosition(commentsList.size() - 1);
+                });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void fetchUsersInfoFromDatabase() {
+        infoDatabaseReference.child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Glide.with(view.getContext())
+                        .load(snapshot.child("photoUrl").getValue(String.class))
+                        .circleCrop()
+                        .into(imageView);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void retrieveArguments() {
+        if (getArguments() != null) {
+            postId = getArguments().getString("postId");
+            userId = getArguments().getString("userId");
+            username = getArguments().getString("username");
+        }
+    }
+
+    private void initializeFirebaseAuth() {
+        currentUser = Utility.getCurrentUser();
+        databaseReference = Utility.getUsersPhotosCollectionReference().child(userId).child(postId).child("comments");
+        infoDatabaseReference = Utility.getUsersInfoCollectionReference();
+    }
+
+    private void setupUi() {
+        imageView = view.findViewById(R.id.userProfileImage);
+        addCommentBtn = view.findViewById(R.id.addCommentBtn);
+        commentContent = view.findViewById(R.id.commentContentEditText);
+
+        setupBottomSheetView();
+        setupRecyclerView();
+        Utility.disableView(commentContent.getEditText(), addCommentBtn);
+    }
+
+    private void setupBottomSheetView() {
+        BottomSheetDialog dialog = (BottomSheetDialog) getDialog();
+        BottomSheetBehavior<FrameLayout> behavior = dialog.getBehavior();
+
+        behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        behavior.setSkipCollapsed(true);
+    }
+
+    private void setupRecyclerView() {
+        recyclerView = view.findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+    }
+
+    public static CommentFragment newCommentFragment(String postId, String userId, String username) {
         CommentFragment commentFragment = new CommentFragment();
         Bundle args = new Bundle();
         args.putString("postId", postId);

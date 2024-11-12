@@ -33,27 +33,13 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     @Override
     public UserAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_card, parent, false);
-        return new ViewHolder(view);
+        return new ViewHolder(view, context);
     }
 
     @Override
     public void onBindViewHolder(@NonNull UserAdapter.ViewHolder holder, int position) {
         UserModel item = userModels.get(position);
-
-        holder.imageAuthor.setText(item.getUsername());
-
-        Glide.with(context)
-                .load(item.getProfilePhotoUrl())
-                .apply(RequestOptions.circleCropTransform())
-                .error(R.drawable.profile_default)
-                .into(holder.userProfileImage);
-
-        holder.main.setOnClickListener(v -> {
-            Intent intent = new Intent(context, UserProfileActivity.class);
-            intent.putExtra("Author", item.getAuthor());
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
-        });
+        holder.bind(item);
     }
 
     @Override
@@ -65,11 +51,36 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         ImageView userProfileImage;
         TextView imageAuthor;
         RelativeLayout main;
-        public ViewHolder(@NonNull View itemView) {
+        Context context;
+        public ViewHolder(@NonNull View itemView, Context context) {
             super(itemView);
             userProfileImage = itemView.findViewById(R.id.userProfileImage);
             imageAuthor = itemView.findViewById(R.id.imageAuthor);
             main = itemView.findViewById(R.id.main);
+            this.context = context;
+        }
+
+        public void bind(UserModel item) {
+            imageAuthor.setText(item.getUsername());
+
+            loadUserImage(item);
+
+            main.setOnClickListener(v -> openUserProfile(item.getAuthor()));
+        }
+
+        private void openUserProfile(String authorId) {
+            Intent intent = new Intent(context, UserProfileActivity.class);
+            intent.putExtra("Author", authorId);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        }
+
+        private void loadUserImage(UserModel item) {
+            Glide.with(context)
+                    .load(item.getProfilePhotoUrl())
+                    .apply(RequestOptions.circleCropTransform())
+                    .error(R.drawable.profile_default)
+                    .into(userProfileImage);
         }
     }
 }

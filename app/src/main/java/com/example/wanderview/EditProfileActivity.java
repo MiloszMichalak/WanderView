@@ -39,27 +39,60 @@ public class EditProfileActivity extends AppCompatActivity {
     String photoUrl;
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data.getData() != null){
+            profileImageUri = data.getData();
+            isPhotoChanged = true;
+
+            Glide.with(this)
+                    .load(profileImageUri)
+                    .into(userProfileImage);
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_edit_profile);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+
+        setupUi();
+        initializeFirebaseAuth();
+        getDataForUser();
+        setupListeners();
+    }
+
+    private void initializeFirebaseAuth() {
+        currentUser = Utility.getCurrentUser();
+        infoDatabaseReference = Utility.getUsersInfoCollectionReference().child(currentUser.getUid());
+        originalStorageReference = Utility.getUsersProfilePhotosReference().child(currentUser.getUid());
+    }
+
+    private void setupListeners() {
+        userProfileImage.setOnClickListener(v -> {
+            ImagePicker.with(this)
+                    .cropSquare()
+                    .compress(4096)
+                    .maxResultSize(300, 300)
+                    .start();
         });
 
-        usernameEditLayout = findViewById(R.id.usernameEditLayout);
-        usernameEdit = usernameEditLayout.getEditText();
+        saveInfo.setOnClickListener(v -> {
+            String username = usernameEdit.getText().toString();
 
-        userProfileImage = findViewById(R.id.userProfileImage);
+            if (!username.equals(originalUsername)){
+                infoDatabaseReference.child("username").setValue(username);
+            }
 
-        saveInfo = findViewById(R.id.saveInfo);
+            if (isPhotoChanged){
+                addUserPhoto();
+            }
+            finish();
+        });
+    }
 
-        currentUser = Utility.getCurrentUser();
-
-        infoDatabaseReference = Utility.getUsersInfoCollectionReference().child(currentUser.getUid());
-
+    private void getDataForUser() {
         infoDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -78,47 +111,27 @@ public class EditProfileActivity extends AppCompatActivity {
 
             }
         });
-
-        originalStorageReference = Utility.getUsersProfilePhotosReference().child(currentUser.getUid());
-
-        userProfileImage.setOnClickListener(v -> {
-            ImagePicker.with(this)
-                    .cropSquare()
-                    .compress(4096)
-                    .maxResultSize(300, 300)
-                    .start();
-        });
-
-        Utility.disableButton(usernameEdit, saveInfo);
-
-        saveInfo.setOnClickListener(v -> {
-            String username = usernameEdit.getText().toString();
-
-            if (!username.equals(originalUsername)){
-                infoDatabaseReference.child("username").setValue(username);
-            }
-
-            if (isPhotoChanged){
-                originalStorageReference.putFile(profileImageUri).addOnSuccessListener(taskSnapshot -> {
-                    originalStorageReference.getDownloadUrl().addOnSuccessListener(uri -> {
-                       infoDatabaseReference.child("photoUrl").setValue(uri.toString());
-                    });
-                });
-            }
-            finish();
-        });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (data.getData() != null){
-            profileImageUri = data.getData();
-            isPhotoChanged = true;
+    private void setupUi() {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
-            Glide.with(this)
-                    .load(profileImageUri)
-                    .into(userProfileImage);
-        }
+        usernameEditLayout = findViewById(R.id.usernameEditLayout);
+        userProfileImage = findViewById(R.id.userProfileImage);
+        saveInfo = findViewById(R.id.saveInfo);
+
+        Utility.disableView(usernameEditLayout.getEditText() , saveInfo);
+    }
+
+    private void addUserPhoto() {
+        originalStorageReference.putFile(profileImageUri).addOnSuccessListener(taskSnapshot -> {
+            originalStorageReference.getDownloadUrl().addOnSuccessListener(uri -> {
+                infoDatabaseReference.child("photoUrl").setValue(uri.toString());
+            });
+        });
     }
 }

@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.example.wanderview.PostModel.ImageAdapter;
 import com.example.wanderview.PostModel.ImageModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.Timestamp;
@@ -37,30 +38,32 @@ public class HomeFragment extends Fragment {
     ProgressBar progressBar;
     List<ImageModel> imageModels = new ArrayList<>();
     DatabaseReference databaseReference, infoDatabaseReference;
-    String photoUrl;
     SwipeRefreshLayout swipeRefreshLayout;
     LifecycleOwner lifecycleOwner;
+    View view;
+    ImageAdapter adapter;
 
     private final ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), o -> {
-        if (o.getResultCode() == Activity.RESULT_OK){
+        if (o.getResultCode() == Activity.RESULT_OK) {
             Intent data = o.getData();
-            if (data != null){
+            if (data != null) {
                 infoDatabaseReference.child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        imageModels.add(0, new ImageModel(
-                                data.getStringExtra("photoUrl"),
-                                data.getStringExtra("title"),
-                                snapshot.child("username").getValue(String.class),
-                                snapshot.child("photoUrl").getValue(String.class),
-                                currentUser.getUid(),
-                                data.getStringExtra("key"),
-                                Timestamp.now().getSeconds(),
-                                0,
-                                false,
-                                0,
-                                true
-                        ));
+                        imageModels.add(0,
+                                new ImageModel(
+                                        data.getStringExtra("photoUrl"),
+                                        data.getStringExtra("title"),
+                                        snapshot.child("username").getValue(String.class),
+                                        snapshot.child("photoUrl").getValue(String.class),
+                                        currentUser.getUid(),
+                                        data.getStringExtra("key"),
+                                        Timestamp.now().getSeconds(),
+                                        0,
+                                        false,
+                                        0,
+                                        data.getStringExtra("type")
+                                ));
                         recyclerView.getAdapter().notifyItemInserted(0);
                         recyclerView.smoothScrollToPosition(0);
                     }
@@ -75,26 +78,62 @@ public class HomeFragment extends Fragment {
     });
 
     @Override
+    public void onPause() {
+        super.onPause();
+        if (adapter != null){
+            adapter.pauseAll();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (adapter != null){
+            adapter.resumeAll();
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
-
+        view = inflater.inflate(R.layout.fragment_home, container, false);
         lifecycleOwner = this;
 
+        setupUi();
+        initializeFirebaseAuth();
+
+        addImageBtn.setOnClickListener(v ->
+                resultLauncher.launch(new Intent(view.getContext(), AddingImageActivity.class)));
+
+        setupRecyclerView();
+        setupSwipeRefresh();
+
+        return view;
+    }
+
+    private void initializeFirebaseAuth() {
         currentUser = Utility.getCurrentUser();
-
-        addImageBtn = view.findViewById(R.id.addImageBtn);
-
-        progressBar = view.findViewById(R.id.progressBar);
-
         databaseReference = Utility.getUsersPhotosCollectionReference();
         infoDatabaseReference = Utility.getUsersInfoCollectionReference();
+    }
 
-        addImageBtn.setOnClickListener(v -> {
-            resultLauncher.launch(new Intent(view.getContext(), AddingImageActivity.class));
+    private void setupSwipeRefresh() {
+        swipeRefreshLayout.setProgressBackgroundColorSchemeResource(R.color.colorSecondary);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
+
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            progressBar.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.INVISIBLE);
+
+            adapter.resetAll();
+            fetchItemsFromStorage(databaseReference);
+            swipeRefreshLayout.setRefreshing(false);
         });
+    }
 
-        recyclerView = view.findViewById(R.id.recyclerView);
+    private void setupRecyclerView() {
+        recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
+        fetchItemsFromStorage(databaseReference);
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -103,44 +142,34 @@ public class HomeFragment extends Fragment {
                 swipeRefreshLayout.setEnabled(!recyclerView.canScrollVertically(-1));
             }
         });
-
-        swipeRefreshLayout = view.findViewById(R.id.swipeRefresh);
-
-        swipeRefreshLayout.setProgressBackgroundColorSchemeResource(R.color.colorSecondary);
-        swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
-
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            progressBar.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.INVISIBLE);
-            fetchImagesFromStorage(databaseReference);
-            swipeRefreshLayout.setRefreshing(false);
-        });
-
-        // todo wylaczyc ladowanie po ponowym nacisnieciu home
-        recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
-        fetchImagesFromStorage(databaseReference);
-
-
-        return view;
     }
 
-    public void fetchImagesFromStorage(DatabaseReference databaseReference){
+    private void setupUi() {
+        addImageBtn = view.findViewById(R.id.addImageBtn);
+        progressBar = view.findViewById(R.id.progressBar);
+        recyclerView = view.findViewById(R.id.recyclerView);
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefresh);
+    }
+
+    public void fetchItemsFromStorage(DatabaseReference databaseReference) {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 imageModels.clear();
 
-                for (DataSnapshot userSnapshot : dataSnapshot.getChildren()){
+                for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
 
-                    for (DataSnapshot imageSnapshot : userSnapshot.getChildren()){
+                    for (DataSnapshot imageSnapshot : userSnapshot.getChildren()) {
                         String author = imageSnapshot.child("author").getValue(String.class);
                         String imageUrl = imageSnapshot.child("url").getValue(String.class);
                         String title = imageSnapshot.child("title").getValue(String.class);
+                        String type = imageSnapshot.child("type").getValue(String.class);
                         Long date = imageSnapshot.child("date").getValue(Long.class);
                         String key = imageSnapshot.getKey();
 
-                        if (!author.equals(currentUser.getUid())){
+                        if (!author.equals(currentUser.getUid())) {
                             boolean likedByCurrentUser = imageSnapshot.child("likes").child(currentUser.getUid()).exists();
+
                             infoDatabaseReference.child(author).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -157,11 +186,13 @@ public class HomeFragment extends Fragment {
                                             date,
                                             likes,
                                             likedByCurrentUser,
-                                            commentsAmount
+                                            commentsAmount,
+                                            type
                                     ));
-
-                                    Utility.allImagesLoaded(imageModels, recyclerView, getContext(), progressBar, true, getActivity().getSupportFragmentManager(), lifecycleOwner);
-                                    Collections.shuffle(imageModels);
+                                    if (imageModels.size() == dataSnapshot.getChildrenCount()) {
+                                        Collections.shuffle(imageModels);
+                                        Utility.allImagesLoaded(imageModels, recyclerView, getContext(), progressBar, true, getActivity().getSupportFragmentManager(), lifecycleOwner);
+                                    }
                                 }
 
                                 @Override
@@ -178,7 +209,7 @@ public class HomeFragment extends Fragment {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
+
         });
     }
-
 }

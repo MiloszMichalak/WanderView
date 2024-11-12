@@ -5,25 +5,24 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorSecondary">@color/colorSecondary</item>
         <item name="colorAccent">@color/colorAccent</item>
+
         <item name="android:windowBackground">@color/colorPrimary</item>
-        <item name="android:fontFamily">@font/signika</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
     </style>
 
-    <style name="Theme.WanderView" parent="Base.Theme.WanderView">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorSecondary">@color/colorSecondary</item>
-        <item name="colorAccent">@color/colorAccent</item>
-    </style>
+    <style name="Theme.WanderView" parent="Base.Theme.WanderView" />
 
     <style name="FilledBox" parent="Widget.Material3.TextInputLayout.FilledBox">
         <item name="errorEnabled">true</item>
         <item name="cursorColor">@color/colorAccent</item>
         <item name="boxBackgroundColor">@color/colorPrimary</item>
         <item name="android:textColorHint">@color/colorAccent</item>
-        <item name="boxStrokeColor">@color/colorSecondary</item>
+        <item name="boxStrokeColor">@color/border_color</item>
         <item name="boxStrokeErrorColor">@color/colorSecondary</item>
         <item name="errorTextColor">@color/red</item>
-
+        <item name="hintTextColor">@color/hint_white</item>
     </style>
 
     <style name="MaterialButton" parent="Widget.Material3.Button">

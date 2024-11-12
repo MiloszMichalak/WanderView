@@ -27,9 +27,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
 
     List<CommentModel> commentList;
     Context context;
-    DatabaseReference databaseReference;
     long likeAmount;
-    String uid;
 
     public CommentAdapter(List<CommentModel> commentList, Context context) {
         this.commentList = commentList;
@@ -39,99 +37,16 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
     @NonNull
     @Override
     public CommentAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.comment_model, parent, false);
-        return new ViewHolder(view);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.comment_card, parent, false);
+        return new ViewHolder(view, context);
     }
 
     @Override
     public void onBindViewHolder(@NonNull CommentAdapter.ViewHolder holder, int position) {
         CommentModel item = commentList.get(position);
-
-        holder.commentAuthor.setText(item.getAuthor());
-
-        uid = Utility.getCurrentUser().getUid();
-
-        Glide.with(context)
-                .load(item.getProfileImageUrl())
-                .error(R.drawable.profile_default)
-                .circleCrop()
-                .into(holder.userProfileImage);
-
-        holder.commentContent.setText(item.getText());
-
-        Utility.secondsToDate(item.getSeconds(), context, holder.commentDate);
-
-        View.OnClickListener listener = v -> {
-            Intent intent = new Intent(context, UserProfileActivity.class);
-            intent.putExtra("Author", item.getUid());
-            context.startActivity(intent);
-        };
-        holder.userProfileImage.setOnClickListener(listener);
-        holder.commentAuthor.setOnClickListener(listener);
+        holder.bind(item, position, commentList);
 
         likeAmount = item.getLikes();
-
-        Utility.hideLikesIf0Comments(likeAmount, holder.likeAmount);
-
-        if (item.isUserLiked){
-            holder.likeButton.setColorFilter(ContextCompat.getColor(context, R.color.red), PorterDuff.Mode.SRC_IN);
-        }
-
-        holder.likeButton.setOnClickListener(v -> {
-            likeAmount = item.getLikes();
-            databaseReference = Utility.getUsersPhotosCollectionReference().child(item.getAuthorPostId()).child(item.getPostId())
-                    .child("comments").child(item.getKey());
-
-            if (!item.isUserLiked()){
-                holder.likeButton.animate().scaleX(1.2f).scaleY(1.2f).setDuration(150).withEndAction(() ->
-                        holder.likeButton.animate().scaleX(1f).scaleY(1f).setDuration(150).start());
-
-                holder.likeButton.setColorFilter(ContextCompat.getColor(context, R.color.red), PorterDuff.Mode.SRC_IN);
-                likeAmount += 1;
-
-                databaseReference.child("likes").child(uid).setValue(true);
-            } else {
-                holder.likeButton.setColorFilter(null);
-                likeAmount -= 1;
-                databaseReference.child("likes").child(uid).removeValue();
-            }
-            item.isUserLiked = !(item.isUserLiked);
-
-            holder.likeAmount.animate().scaleX(1.2f).scaleY(1.0f).setDuration(200).withEndAction(() -> {
-                if (likeAmount > 0){
-                    holder.likeAmount.setVisibility(View.VISIBLE);
-                    holder.likeAmount.setText(String.valueOf(likeAmount));
-                    holder.likeAmount.animate().scaleX(1.0f).scaleY(1.0f).setDuration(200).start();
-                } else {
-                    holder.likeAmount.setVisibility(View.INVISIBLE);
-                }
-            });
-            item.setLikes(likeAmount);
-        });
-
-        holder.main.setOnLongClickListener(v -> {
-            if (uid.equals(item.getUid())) {
-                PopupMenu popupMenu = new PopupMenu(context, v);
-                popupMenu.getMenuInflater().inflate(R.menu.comment_popup_menu, popupMenu.getMenu());
-
-                popupMenu.show();
-
-                popupMenu.setOnMenuItemClickListener(item1 -> {
-                    if (item1.getItemId() == R.id.deleteComment) {
-
-                        databaseReference = Utility.getUsersPhotosCollectionReference().child(item.getAuthorPostId())
-                                .child(item.getPostId()).child("comments").child(item.getKey());
-
-                        databaseReference.removeValue();
-                        commentList.remove(position);
-                        notifyItemRemoved(position);
-                    }
-
-                    return false;
-                });
-            }
-            return true;
-        });
     }
 
     @Override
@@ -141,10 +56,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         RecyclerView recyclerView;
-        TextView commentContent, commentAuthor, commentDate, likeAmount;
+        TextView commentContent, commentAuthor, commentDate, likeAmountTextView;
         ImageView userProfileImage, likeButton;
         RelativeLayout main;
-        public ViewHolder(@NonNull View itemView) {
+        Context context;
+        public ViewHolder(@NonNull View itemView, Context context) {
             super(itemView);
             recyclerView = itemView.findViewById(R.id.recyclerView);
             userProfileImage = itemView.findViewById(R.id.userProfileImage);
@@ -152,8 +68,112 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
             commentAuthor = itemView.findViewById(R.id.commentAuthor);
             commentDate = itemView.findViewById(R.id.commentDate);
             likeButton = itemView.findViewById(R.id.likeButton);
-            likeAmount = itemView.findViewById(R.id.likeAmount);
+            likeAmountTextView = itemView.findViewById(R.id.likeAmount);
             main = itemView.findViewById(R.id.main);
+            this.context = context;
+        }
+
+        public void bind(CommentModel item, int position, List<CommentModel> commentsList) {
+            commentAuthor.setText(item.getAuthor());
+
+            loadUserImage(item);
+            if (item.isUserLiked){
+                likeButton.setColorFilter(ContextCompat.getColor(context, R.color.red), PorterDuff.Mode.SRC_IN);
+            }
+
+            long likeAmount = item.getLikes();
+
+            commentContent.setText(item.getText());
+            Utility.secondsToDate(item.getSeconds(), context, commentDate);
+            Utility.hideLikesIf0Comments(likeAmount, likeAmountTextView);
+
+            setupGetToUserInfoListener(item);
+
+            setupLikeButtonListener(item);
+            setupDeleteCommentListener(item, position, commentsList, recyclerView);
+        }
+
+        private void setupDeleteCommentListener(CommentModel item, int position, List<CommentModel> commentList, RecyclerView recyclerView) {
+            main.setOnLongClickListener(v -> {
+                if (Utility.getCurrentUser().getUid().equals(item.getUid())) {
+                    PopupMenu popupMenu = new PopupMenu(context, v);
+                    popupMenu.getMenuInflater().inflate(R.menu.comment_popup_menu, popupMenu.getMenu());
+
+                    popupMenu.show();
+
+                    popupMenu.setOnMenuItemClickListener(item1 -> {
+                        if (item1.getItemId() == R.id.deleteComment) {
+
+                            DatabaseReference databaseReference = Utility.getUsersPhotosCollectionReference().child(item.getAuthorPostId())
+                                    .child(item.getPostId()).child("comments").child(item.getKey());
+
+                            databaseReference.removeValue();
+                            commentList.remove(position);
+                            recyclerView.getAdapter().notifyItemRemoved(position);
+                        }
+
+                        return false;
+                    });
+                }
+                return true;
+            });
+        }
+
+        private void setupLikeButtonListener(CommentModel item) {
+            likeButton.setOnClickListener(v -> {
+                final long finalLikeAmount = item.getLikes();
+                long updatedLikeAmount;
+                DatabaseReference databaseReference = Utility.getUsersPhotosCollectionReference().child(item.getAuthorPostId()).child(item.getPostId())
+                        .child("comments").child(item.getKey());
+
+                if (!item.isUserLiked()){
+                    likeButton.animate().scaleX(1.2f).scaleY(1.2f).setDuration(150).withEndAction(() ->
+                            likeButton.animate().scaleX(1f).scaleY(1f).setDuration(150).start());
+
+                    likeButton.setColorFilter(ContextCompat.getColor(context, R.color.red), PorterDuff.Mode.SRC_IN);
+                    updatedLikeAmount = finalLikeAmount + 1;
+
+                    databaseReference.child("likes").child(Utility.getCurrentUser().getUid()).setValue(true);
+                } else {
+                    likeButton.clearColorFilter();
+                    updatedLikeAmount = finalLikeAmount - 1;
+                    databaseReference.child("likes").child(Utility.getCurrentUser().getUid()).removeValue();
+                }
+                item.isUserLiked = !(item.isUserLiked);
+
+                updateLikeAmountDisplay(updatedLikeAmount);
+                item.setLikes(updatedLikeAmount);
+            });
+        }
+
+        private void updateLikeAmountDisplay(long likeAmount) {
+            likeAmountTextView.animate().scaleX(1.2f).scaleY(1.0f).setDuration(200).withEndAction(() -> {
+                if (likeAmount > 0){
+                    likeAmountTextView.setVisibility(View.VISIBLE);
+                    likeAmountTextView.setText(String.valueOf(likeAmount));
+                    likeAmountTextView.animate().scaleX(1.0f).scaleY(1.0f).setDuration(200).start();
+                } else {
+                    likeAmountTextView.setVisibility(View.INVISIBLE);
+                }
+            });
+        }
+
+        private void setupGetToUserInfoListener(CommentModel item) {
+            View.OnClickListener listener = v -> {
+                Intent intent = new Intent(context, UserProfileActivity.class);
+                intent.putExtra("Author", item.getUid());
+                context.startActivity(intent);
+            };
+            userProfileImage.setOnClickListener(listener);
+            commentAuthor.setOnClickListener(listener);
+        }
+
+        private void loadUserImage(CommentModel item) {
+            Glide.with(context)
+                    .load(item.getProfileImageUrl())
+                    .error(R.drawable.profile_default)
+                    .circleCrop()
+                    .into(userProfileImage);
         }
     }
 }

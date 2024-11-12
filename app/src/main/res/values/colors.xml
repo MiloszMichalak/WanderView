@@ -3,8 +3,9 @@
     <color name="colorPrimary">#FDFDFD</color>
     <color name="colorSecondary">#697565</color>
     <color name="colorAccent">#1E201E</color>
+
     <color name="black">#0A0A0A</color>
     <color name="white">#FAFAFA</color>
-    <color name="beige">#CBBBA0</color>
+    <color name="hint_white">#AAFAFAFA</color>
     <color name="red">#CC0000</color>
 </resources>

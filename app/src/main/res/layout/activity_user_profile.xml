@@ -19,7 +19,7 @@
         android:layout_alignParentEnd="true"
         android:backgroundTint="@color/colorPrimary"
         android:contentDescription="@string/user_option"
-        android:id="@+id/userOption"/>
+        android:id="@+id/user_option"/>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
@@ -44,7 +44,7 @@
                     android:contentDescription="@string/user_picture" />
 
                 <TextView
-                    android:id="@+id/userName"
+                    android:id="@+id/user_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/imageView"
@@ -53,20 +53,20 @@
                     android:textSize="25sp" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/editProfileBtn"
+                    android:id="@+id/edit_profile_btn"
                     style="@style/MaterialButton"
                     android:layout_width="140dp"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/userName"
+                    android:layout_below="@id/user_name"
                     android:layout_centerHorizontal="true"
                     android:text="@string/edit_profile" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/noPosts"
+                    android:id="@+id/no_posts"
                     android:text="@string/no_posts"
-                    android:layout_below="@id/editProfileBtn"
+                    android:layout_below="@id/edit_profile_btn"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="40dp"
                     android:textSize="40sp"
@@ -76,7 +76,7 @@
                     android:id="@+id/imageList"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_below="@+id/editProfileBtn"
+                    android:layout_below="@id/edit_profile_btn"
                     android:layout_marginTop="20dp"
                     app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 

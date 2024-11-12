@@ -1,60 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AddingImageActivity"
-    android:layout_margin="20dp"
-    android:fillViewport="true">
+    android:layout_margin="10dp"
+    android:fillViewport="true"
+    tools:context=".AddingImageActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/add_image"
-            android:textSize="50sp"
-            android:gravity="center_horizontal"
-            android:id="@+id/addImage"/>
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="match_parent"
-            android:layout_height="400dp"
-            android:layout_below="@+id/addImage"
-            android:layout_marginTop="36dp"
-            android:contentDescription="@string/add_image"
-            android:background="@drawable/dashed_border" />
-
         <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
+            android:id="@+id/imageTitle"
             style="@style/FilledBox"
-            android:hint="@string/add_title"
-            android:layout_below="@id/imageView"
-            android:layout_marginTop="20dp"
-            android:id="@+id/imageTitle">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/uploadImage"
+            app:boxStrokeWidth="0dp"
+            app:boxStrokeWidthFocused="0dp"
+            app:hintEnabled="false"
+            app:hintTextColor="@color/hint_white">
+
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:hint="@string/add_title"
                 android:inputType="textAutoCorrect" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/uploadImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/MaterialButton"
-            android:text="@string/upload_image"
+            android:layout_alignParentEnd="true"
             android:layout_gravity="center_horizontal"
-            android:layout_below="@+id/imageTitle"
+            android:text="@string/upload"
+            android:textColor="@color/white"
+            app:backgroundTint="@color/colorSecondary" />
+
+        <!--todo tymczasowo na caly ekran, docelowo maxHeight i po kliknieciu podglad-->
+        <androidx.cardview.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/imageTitle"
             android:layout_centerHorizontal="true"
-            android:id="@+id/uploadImage"
-            android:layout_marginTop="30dp"/>
+            app:cardCornerRadius="20dp">
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/add_image"
+                android:visibility="gone" />
+
+            <com.google.android.exoplayer2.ui.StyledPlayerView
+                android:id="@+id/playerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:controller_layout_id="@layout/custom_controller_layout"
+                app:resize_mode="fit"
+                app:show_buffering="when_playing" />
+
+        </androidx.cardview.widget.CardView>
 
     </RelativeLayout>
-
 
 </ScrollView>

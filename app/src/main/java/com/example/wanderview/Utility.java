@@ -7,7 +7,6 @@ import android.text.TextWatcher;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -21,7 +20,6 @@ import com.example.wanderview.PostModel.ImageAdapter;
 import com.example.wanderview.PostModel.ImageModel;
 import com.example.wanderview.UserListModel.UserAdapter;
 import com.example.wanderview.UserListModel.UserModel;
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -71,19 +69,14 @@ public class Utility {
         return FirebaseDatabase.getInstance("https://wanderview-8b391-default-rtdb.europe-west1.firebasedatabase.app/").getReference().child("UsersInfo");
     }
 
-    public static String timestampToDate(long timestamp, String format){
-        Date date = new Date(timestamp * 1000);
-
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format, Locale.getDefault());
-        return simpleDateFormat.format(date);
-    }
-
-    public static void allImagesLoaded(List<ImageModel> imageModels, RecyclerView recyclerView, Context context, ProgressBar progressBar, boolean isClickable,
+    public static ImageAdapter allImagesLoaded(List<ImageModel> imageModels, RecyclerView recyclerView, Context context, ProgressBar progressBar, boolean isClickable,
                                        FragmentManager fragmentManager, LifecycleOwner lifecycleOwner){
         ImageAdapter adapter = new ImageAdapter(context, imageModels, isClickable, fragmentManager, recyclerView, lifecycleOwner);
         recyclerView.setAdapter(adapter);
         recyclerView.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.INVISIBLE);
+
+        return adapter;
     }
 
     public static void allUsersLoaded(List<UserModel> array, RecyclerView recyclerView, Context context) {
@@ -111,34 +104,17 @@ public class Utility {
         } else if (days < 7){
             imageDate.setText(context.getString(R.string.time_in_days, days));
         } else {
-            imageDate.setText(Utility.timestampToDate(seconds, "dd:MM"));
+            imageDate.setText(timestampToDate(secondsTimestamp, "dd/MM"));
         }
     }
 
-    public static void disableButton(EditText usernameEdit, MaterialButton saveInfo){
-        usernameEdit.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    public static String timestampToDate(long timestamp, String format){
+        Date date = new Date(timestamp * 1000);
 
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() == 0){
-                    saveInfo.setEnabled(false);
-                    saveInfo.setAlpha(0.5f);
-                } else {
-                    saveInfo.setEnabled(true);
-                    saveInfo.setAlpha(1f);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format, Locale.getDefault());
+        return simpleDateFormat.format(date);
     }
+
 
     public static void deleteError(EditText editText, TextInputLayout textInputLayout){
         editText.addTextChangedListener(new TextWatcher() {
@@ -163,9 +139,9 @@ public class Utility {
         }
     }
 
-    public static void disableImageView(EditText editText, ImageView addCommentBtn) {
-        addCommentBtn.setEnabled(false);
-        addCommentBtn.setAlpha(0.5f);
+    public static <T extends View> void disableView(EditText editText, T view) {
+        view.setEnabled(false);
+        view.setAlpha(0.5f);
 
         editText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -175,11 +151,11 @@ public class Utility {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() == 0){
-                    addCommentBtn.setEnabled(false);
-                    addCommentBtn.setAlpha(0.5f);
+                    view.setEnabled(false);
+                    view.setAlpha(0.5f);
                 } else {
-                    addCommentBtn.setEnabled(true);
-                    addCommentBtn.setAlpha(1f);
+                    view.setEnabled(true);
+                    view.setAlpha(1f);
                 }
             }
 

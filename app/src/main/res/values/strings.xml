@@ -18,8 +18,8 @@
     <string name="must_verify">You must verify email</string>
     <string name="logout">Log out</string>
     <string name="add_image">Add image</string>
-    <string name="upload_image">Upload image</string>
-    <string name="add_title">Add title</string>
+    <string name="upload">Upload</string>
+    <string name="add_title">Add title…</string>
     <string name="landscape_image">landscape image</string>
     <string name="user_picture">User profile picture</string>
     <string name="edit_profile">Edit profile</string>

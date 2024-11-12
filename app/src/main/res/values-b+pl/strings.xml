@@ -17,8 +17,8 @@
     <string name="must_verify">Musisz potwierdzić swój email</string>
     <string name="logout">Wyloguj</string>
     <string name="add_image">Dodaj zdjęcie</string>
-    <string name="upload_image">Wrzuć zdjecie</string>
-    <string name="add_title">Dodaj tytuł</string>
+    <string name="upload">Wrzuć</string>
+    <string name="add_title">Dodaj tytuł…</string>
     <string name="landscape_image">Zdjęcie krajobrazu</string>
     <string name="user_picture">Zdjęcie profilowe użytkownika</string>
     <string name="edit_profile">Edytuj profil</string>

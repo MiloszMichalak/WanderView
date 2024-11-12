@@ -36,37 +36,15 @@ public class UsersListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_users_list);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
 
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(getString(R.string.likes));
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setupUi();
+        setupToolbar();
+        setupBackPressed();
+        initializeFirebase();
+        fetchUsersFromDatabase();
+    }
 
-        toolbar.setNavigationOnClickListener(v -> finish());
-
-        getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                finish();
-            }
-        });
-
-        recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
-
-        Intent intent = getIntent();
-
-        String author = intent.getStringExtra("author");
-        String postKey = intent.getStringExtra("postKey");
-
-        databaseReference = Utility.getUsersPhotosCollectionReference().child(author).child(postKey).child("likes");
-        infoDatabaseReference = Utility.getUsersInfoCollectionReference();
-
+    private void fetchUsersFromDatabase() {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -80,7 +58,10 @@ public class UsersListActivity extends AppCompatActivity {
                             String username = snapshot.child("username").getValue(String.class);
                             String photoUrl = snapshot.child("photoUrl").getValue(String.class);
 
-                            userModels.add(new UserModel(key, username, photoUrl));
+                            userModels.add(new UserModel(
+                                    key,
+                                    username,
+                                    photoUrl));
 
                             Utility.allUsersLoaded(userModels, recyclerView, getApplicationContext());
                         }
@@ -98,5 +79,43 @@ public class UsersListActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void initializeFirebase() {
+        Intent intent = getIntent();
+        String author = intent.getStringExtra("author");
+        String postKey = intent.getStringExtra("postKey");
+
+        databaseReference = Utility.getUsersPhotosCollectionReference().child(author).child(postKey).child("likes");
+        infoDatabaseReference = Utility.getUsersInfoCollectionReference();
+    }
+
+    private void setupBackPressed() {
+        getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                finish();
+            }
+        });
+    }
+
+    private void setupToolbar() {
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(getString(R.string.likes));
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        toolbar.setNavigationOnClickListener(v -> finish());
+    }
+
+    private void setupUi() {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
+        toolbar = findViewById(R.id.toolbar);
+        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
     }
 }
