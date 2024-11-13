@@ -27,7 +27,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
 
     List<CommentModel> commentList;
     Context context;
-    long likeAmount;
 
     public CommentAdapter(List<CommentModel> commentList, Context context) {
         this.commentList = commentList;
@@ -45,8 +44,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
     public void onBindViewHolder(@NonNull CommentAdapter.ViewHolder holder, int position) {
         CommentModel item = commentList.get(position);
         holder.bind(item, position, commentList);
-
-        likeAmount = item.getLikes();
     }
 
     @Override

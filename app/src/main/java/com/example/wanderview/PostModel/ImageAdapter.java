@@ -15,6 +15,10 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.media3.common.MediaItem;
+import androidx.media3.common.Player;
+import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.ui.PlayerView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -25,10 +29,6 @@ import com.example.wanderview.R;
 import com.example.wanderview.UserListModel.UsersListActivity;
 import com.example.wanderview.UserProfileActivity;
 import com.example.wanderview.Utility;
-import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.MediaItem;
-import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.ui.StyledPlayerView;
 import com.google.firebase.database.DatabaseReference;
 
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     private final FragmentManager fragmentManager;
     private final RecyclerView recyclerView;
     private final LifecycleOwner lifecycleOwner;
-    private List<ImageAdapter.ViewHolder> viewHolders = new ArrayList<>();
+    private List<ViewHolder> viewHolders = new ArrayList<>();
     private SparseArray<ExoPlayer> playerMap = new SparseArray<>();
 
     public ImageAdapter(Context context, List<ImageModel> imageModels, boolean isClickable, FragmentManager fragmentManager, RecyclerView recyclerView, LifecycleOwner lifecycleOwner) {
@@ -55,18 +55,18 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
     @NonNull
     @Override
-    public ImageAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.image_card, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ImageAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ImageModel item = imageModels.get(position);
         holder.bind(item, context, fragmentManager, isClickable, recyclerView, position, lifecycleOwner, imageModels);
 
         playerMap.put(position, holder.exoPlayer);
-        if (item.getType().equals("video") && !viewHolders.contains(holder)){
+        if (item.getType().equals("video") && !viewHolders.contains(holder)) {
             viewHolders.add(holder);
         }
     }
@@ -76,38 +76,38 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         return imageModels.size();
     }
 
-    public void pauseAll(){
-        for (ImageAdapter.ViewHolder holder : viewHolders) {
-            if (holder.exoPlayer != null && holder.exoPlayer.isPlaying()){
+    public void pauseAll() {
+        for (ViewHolder holder : viewHolders) {
+            if (holder.exoPlayer != null && holder.exoPlayer.isPlaying()) {
                 holder.exoPlayer.pause();
             }
         }
     }
 
-    public void resumeAll(){
-        for (ImageAdapter.ViewHolder holder : viewHolders) {
-            if (holder.exoPlayer != null){
+    public void resumeAll() {
+        for (ViewHolder holder : viewHolders) {
+            if (holder.exoPlayer != null) {
                 holder.exoPlayer.play();
             }
         }
     }
 
-    public void resetAll(){
-        for (ImageAdapter.ViewHolder holder : viewHolders){
+    public void resetAll() {
+        for (ViewHolder holder : viewHolders) {
             holder.exoPlayer.release();
         }
     }
 
-    public void pauseVideoAtPosition(int position){
+    public void pauseVideoAtPosition(int position) {
         ExoPlayer player = playerMap.get(position);
-        if (player != null && player.isPlaying()){
+        if (player != null && player.isPlaying()) {
             player.stop();
         }
     }
 
-    public void resumeVideoAtPosition(int position){
+    public void resumeVideoAtPosition(int position) {
         ExoPlayer player = playerMap.get(position);
-        if (player != null && !player.isPlaying()){
+        if (player != null && !player.isPlaying()) {
             player.play();
         }
     }
@@ -115,7 +115,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         final ImageView imageView, userProfileImage, postOptions, commentButton, likeButton;
         final TextView imageTitle, imageAuthor, imageDate, likeAmountTextView, commentAmount;
-        StyledPlayerView playerView;
+        PlayerView playerView;
         ExoPlayer exoPlayer;
 
         public ViewHolder(@NonNull View itemView) {
@@ -278,6 +278,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                 MediaItem mediaItem = MediaItem.fromUri(Uri.parse(item.getImageUrl()));
 
                 exoPlayer.setMediaItem(mediaItem);
+
                 exoPlayer.prepare();
                 exoPlayer.play();
             } else {

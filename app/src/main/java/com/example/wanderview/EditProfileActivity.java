@@ -3,7 +3,6 @@ package com.example.wanderview;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.widget.EditText;
 import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
@@ -27,7 +26,6 @@ import com.google.firebase.storage.StorageReference;
 public class EditProfileActivity extends AppCompatActivity {
 
     TextInputLayout usernameEditLayout;
-    EditText usernameEdit;
     ImageView userProfileImage;
     FirebaseUser currentUser;
     Uri profileImageUri;
@@ -79,7 +77,7 @@ public class EditProfileActivity extends AppCompatActivity {
         });
 
         saveInfo.setOnClickListener(v -> {
-            String username = usernameEdit.getText().toString();
+            String username = usernameEditLayout.getEditText().getText().toString();
 
             if (!username.equals(originalUsername)){
                 infoDatabaseReference.child("username").setValue(username);
@@ -97,7 +95,7 @@ public class EditProfileActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 originalUsername = snapshot.child("username").getValue(String.class);
-                usernameEdit.setText(originalUsername);
+                usernameEditLayout.getEditText().setText(originalUsername);
 
                 photoUrl = snapshot.child("photoUrl").getValue(String.class);
                 Glide.with(getApplicationContext())

@@ -26,7 +26,6 @@ public class MainActivity extends AppCompatActivity {
     ImageView userProfileSettings;
     FirebaseUser currentUser;
     DatabaseReference infoDatabaseReference;
-    String username;
     String photoUrl;
     BottomNavigationView bottomNavigationView;
     final Fragment homeFragment = new HomeFragment();
@@ -88,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
         infoDatabaseReference.child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                username = snapshot.child("username").getValue(String.class);
                 photoUrl = snapshot.child("photoUrl").getValue(String.class);
                 Glide.with(getApplicationContext())
                         .load(photoUrl)

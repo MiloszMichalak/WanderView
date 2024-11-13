@@ -57,7 +57,7 @@
                 android:contentDescription="@string/add_image"
                 android:visibility="gone" />
 
-            <com.google.android.exoplayer2.ui.StyledPlayerView
+            <androidx.media3.ui.PlayerView
                 android:id="@+id/playerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

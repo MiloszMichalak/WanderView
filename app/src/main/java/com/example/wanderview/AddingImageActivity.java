@@ -14,11 +14,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.media3.common.MediaItem;
+import androidx.media3.common.Player;
+import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.ui.PlayerView;
 
-import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.MediaItem;
-import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.ui.StyledPlayerView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.Timestamp;
@@ -40,7 +40,7 @@ public class AddingImageActivity extends AppCompatActivity {
     private Uri photoUri;
     private DatabaseReference databaseReference;
     private String key, type;
-    private StyledPlayerView playerView;
+    private PlayerView playerView;
     private ExoPlayer exoPlayer;
     private boolean isPlaying;
 
